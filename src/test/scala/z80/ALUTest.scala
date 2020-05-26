@@ -50,6 +50,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.flagsOut.expect("b0001_0001".U)
     }
   }
+
   behavior of "ADC"
 
   it should "add the inputs and carry bit" in {
@@ -114,11 +115,57 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "subtract the inputs and carry bit" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sbc)
-      c.io.a.poke(3.U)
+      c.io.a.poke(2.U)
       c.io.b.poke(1.U)
       c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0100_0010".U)
+    }
+  }
+
+  behavior of "CP"
+
+  it should "compares the inputs" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(2.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0000".U)
       c.io.result.expect(1.U)
       c.io.flagsOut.expect("b0000_0010".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(1.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0000".U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0100_0010".U)
+    }
+  }
+
+  it should "set the half-carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(16.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0000".U)
+      c.io.result.expect(15.U)
+      c.io.flagsOut.expect("b0001_0010".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(0.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0000".U)
+      c.io.result.expect(255.U)
+      c.io.flagsOut.expect("b0001_0011".U)
     }
   }
 }
