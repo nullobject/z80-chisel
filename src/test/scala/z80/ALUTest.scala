@@ -108,4 +108,17 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.flagsOut.expect("b0001_0011".U)
     }
   }
+
+  behavior of "SBC"
+
+  it should "subtract the inputs and carry bit" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sbc)
+      c.io.a.poke(3.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0010".U)
+    }
+  }
 }

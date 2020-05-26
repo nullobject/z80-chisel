@@ -10,6 +10,9 @@ object Ops {
   val add :: adc :: sub :: sbc :: Nil = Enum(4)
 }
 
+/**
+ * Processor flags
+ */
 class Flags extends Bundle {
   val sign = UInt(1.W)
   val zero = UInt(1.W)
@@ -21,6 +24,9 @@ class Flags extends Bundle {
   val carry = UInt(1.W)
 }
 
+/**
+ * Arithmetic logic unit
+ */
 class ALU extends Module {
   val io = IO(new Bundle {
     val op = Input(UInt(4.W))
@@ -31,30 +37,35 @@ class ALU extends Module {
     val flagsOut = Output(Bits(8.W))
   })
 
-  // set default value
   val result = WireDefault(0.U(9.W))
+  val flagsIn = io.flagsIn.asTypeOf(new Flags)
+  val flagsOut = io.flagsIn.asTypeOf(new Flags)
 
   // set flags
-  val flags = io.flagsIn.asTypeOf(new Flags)
-  flags.zero := result(7, 0) === 0.U
-  flags.carry := result(8)
+  flagsOut.zero := result(7, 0) === 0.U
+  flagsOut.carry := result(8)
 
   switch (io.op) {
     is (Ops.add) {
       result := io.a +& io.b
-      flags.half := (io.a(3, 0) +& io.b(3, 0))(4)
+      flagsOut.half := (io.a(3, 0) +& io.b(3, 0))(4)
     }
     is (Ops.adc) {
-      result := io.a +& io.b + io.flagsIn(0)
-      flags.half := (io.a(3, 0) +& io.b(3, 0))(4)
+      result := io.a +& io.b + flagsIn.carry
+      flagsOut.half := (io.a(3, 0) +& io.b(3, 0))(4)
     }
     is (Ops.sub) {
       result := io.a -& io.b
-      flags.half := (io.a(3, 0) -& io.b(3, 0))(4)
-      flags.subtract := 1.U
+      flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
+      flagsOut.subtract := 1.U
+    }
+    is (Ops.sbc) {
+      result := io.a -& io.b - flagsIn.carry
+      flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
+      flagsOut.subtract := 1.U
     }
   }
 
   io.result := result(7, 0)
-  io.flagsOut := flags.asUInt()
+  io.flagsOut := flagsOut.asUInt()
 }
