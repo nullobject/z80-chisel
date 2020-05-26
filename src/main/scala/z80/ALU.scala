@@ -44,6 +44,10 @@ class ALU extends Module {
       result := io.a +& io.b
       flags.half := (io.a(3, 0) +& io.b(3, 0))(4)
     }
+    is (Ops.adc) {
+      result := io.a +& io.b + io.flagsIn(0)
+      flags.half := (io.a(3, 0) +& io.b(3, 0))(4)
+    }
     is (Ops.sub) {
       result := io.a -& io.b
       flags.half := (io.a(3, 0) -& io.b(3, 0))(4)
