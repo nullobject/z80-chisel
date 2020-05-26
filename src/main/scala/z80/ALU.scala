@@ -10,15 +10,15 @@ object Ops {
   val nop :: add :: sub :: Nil = Enum(3)
 }
 
-object Flags {
-  val C = 0
-  val N = 1
-  val P = 2
-  val X = 3
-  val H = 4
-  val Y = 5
-  val Z = 6
-  val S = 7
+class Flags extends Bundle {
+  val sign = UInt(1.W)
+  val zero = UInt(1.W)
+  val unused2 = UInt(1.W)
+  val half = UInt(1.W)
+  val unused1 = UInt(1.W)
+  val parity = UInt(1.W)
+  val negative = UInt(1.W)
+  val carry = UInt(1.W)
 }
 
 class ALU extends Module {
@@ -64,9 +64,16 @@ class ALU extends Module {
     }
   }
 
-  val carry = result(8)
-  val zero = result(7, 0) === 0.U
+  val flags = Wire(new Flags)
+  flags.carry := result(8)
+  flags.negative := 0.U
+  flags.parity := 0.U
+  flags.unused1 := 0.U
+  flags.half := 0.U
+  flags.unused2 := 0.U
+  flags.zero := result(7, 0) === 0.U
+  flags.sign := 0.U
 
   io.q := result(7, 0)
-  io.flags := Cat(zero, 0.U(6.W), carry)
+  io.flags := flags.asUInt()
 }
