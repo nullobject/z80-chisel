@@ -7,7 +7,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val add :: sub :: Nil = Enum(2)
+  val add :: adc :: sub :: sbc :: Nil = Enum(4)
 }
 
 class Flags extends Bundle {
@@ -23,46 +23,21 @@ class Flags extends Bundle {
 
 class ALU extends Module {
   val io = IO(new Bundle {
-    /**
-     * The operation to be executed
-     */
     val op = Input(UInt(4.W))
-
-    /**
-     * Operand A
-     */
     val a = Input(UInt(8.W))
-
-    /**
-     * Operand B
-     */
     val b = Input(UInt(8.W))
-
-    /**
-     * The result of the operation
-     */
-    val q = Output(UInt(8.W))
-
-    /**
-     * Flags containing metadata about the result of the operation
-     */
-    val flags = Output(Bits(8.W))
+    val flagsIn = Input(Bits(8.W))
+    val result = Output(UInt(8.W))
+    val flagsOut = Output(Bits(8.W))
   })
 
-  // default value
+  // set default value
   val result = WireDefault(0.U(9.W))
 
-  val flags = Wire(new Flags)
-  flags.sign := 0.U
+  // set flags
+  val flags = io.flagsIn.asTypeOf(new Flags)
   flags.zero := result(7, 0) === 0.U
-  flags.unused1 := 0.U
-  flags.half := 0.U
-  flags.unused2 := 0.U
-  flags.parity := 0.U
-  flags.subtract := 0.U
   flags.carry := result(8)
-
-  io.q := 0.U
 
   switch (io.op) {
     is (Ops.add) {
@@ -76,6 +51,6 @@ class ALU extends Module {
     }
   }
 
-  io.q := result(7, 0)
-  io.flags := flags.asUInt()
+  io.result := result(7, 0)
+  io.flagsOut := flags.asUInt()
 }
