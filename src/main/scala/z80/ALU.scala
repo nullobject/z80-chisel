@@ -7,7 +7,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val add :: adc :: sub :: sbc :: cp :: Nil = Enum(5)
+  val add :: adc :: sub :: sbc :: and :: xor :: or :: cp :: Nil = Enum(8)
 }
 
 /**
@@ -64,6 +64,9 @@ class ALU extends Module {
       flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
       flagsOut.subtract := 1.U
     }
+    is (Ops.and) {}
+    is (Ops.xor) {}
+    is (Ops.or) {}
     is (Ops.cp) {
       result := io.a -& io.b
       flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
