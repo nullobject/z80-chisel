@@ -54,7 +54,7 @@ class Flags extends Bundle {
   val sign = UInt(1.W)
   val zero = UInt(1.W)
   val unused2 = UInt(1.W)
-  val half = UInt(1.W)
+  val halfCarry = UInt(1.W)
   val unused1 = UInt(1.W)
   val parity = UInt(1.W)
   val subtract = UInt(1.W)
@@ -87,7 +87,7 @@ class ALU extends Module {
 
   // set flags
   flagsOut.zero := result === 0.U
-  flagsOut.half := core.io.halfCarryOut
+  flagsOut.halfCarry := core.io.halfCarryOut
   flagsOut.subtract := core.io.subtract
   flagsOut.carry := core.io.carryOut
 
@@ -124,50 +124,50 @@ class ALU extends Module {
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)
       flagsOut.carry := io.a(7)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.rlc) {
       result := Cat(io.a(6, 0), io.a(7))
       flagsOut.carry := io.a(7)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.rr) {
       result := Cat(flagsIn.carry, io.a(7, 1))
       flagsOut.carry := io.a(0)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.rrc) {
       result := Cat(io.a(0), io.a(7, 1))
       flagsOut.carry := io.a(0)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.sla) {
       result := Cat(io.a(6, 0), 0.U)
       flagsOut.carry := io.a(7)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.sll) {
       result := Cat(io.a(6, 0), 1.U)
       flagsOut.carry := io.a(7)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.sra) {
       result := Cat(io.a(7), io.a(7, 1))
       flagsOut.carry := io.a(0)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.srl) {
       result := Cat(0.U, io.a(7, 1))
       flagsOut.carry := io.a(0)
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.rld) {
       result := Cat(io.a(7, 4), io.b(7, 4))
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.rrd) {
       result := Cat(io.a(7, 4), io.b(3, 0))
-      flagsOut.half := 0.U
+      flagsOut.halfCarry := 0.U
     }
   }
 
