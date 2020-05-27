@@ -86,8 +86,10 @@ class ALU extends Module {
   core.io.carryIn := 0.U
 
   // set flags
+  flagsOut.sign := result(7)
   flagsOut.zero := result === 0.U
   flagsOut.halfCarry := core.io.halfCarryOut
+  flagsOut.overflow := (io.a(7) && io.b(7) && !result(7)) || (!io.a(7) && !io.b(7) && result(7))
   flagsOut.subtract := core.io.subtract
   flagsOut.carry := core.io.carryOut
 
