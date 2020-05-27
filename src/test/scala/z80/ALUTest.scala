@@ -123,9 +123,48 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  behavior of "AND"
+
+  it should "perform a logical operation" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.and)
+      c.io.a.poke(1.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0000".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  behavior of "XOR"
+
+  it should "perform a logical operation" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.xor)
+      c.io.a.poke(1.U)
+      c.io.b.poke(0.U)
+      c.io.flagsIn.poke("b0000_0000".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  behavior of "OR"
+
+  it should "perform a logical operation" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.or)
+      c.io.a.poke(1.U)
+      c.io.b.poke(0.U)
+      c.io.flagsIn.poke("b0000_0000".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
   behavior of "CP"
 
-  it should "compares the inputs" in {
+  it should "compare the inputs" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.cp)
       c.io.a.poke(2.U)

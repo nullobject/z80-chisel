@@ -37,6 +37,7 @@ class ALU extends Module {
     val flagsOut = Output(Bits(8.W))
   })
 
+  val result = WireDefault(0.U(8.W))
   val flagsIn = io.flagsIn.asTypeOf(new Flags)
   val flagsOut = io.flagsIn.asTypeOf(new Flags)
 
@@ -47,12 +48,39 @@ class ALU extends Module {
   core.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
 
   // set flags
-  flagsOut.zero := core.io.result === 0.U
+  flagsOut.zero := result === 0.U
   flagsOut.half := core.io.halfCarryOut
   flagsOut.subtract := core.io.subtract
   flagsOut.carry := core.io.carryOut
 
+  switch (io.op) {
+    is (Ops.add) {
+      result := core.io.result
+    }
+    is (Ops.adc) {
+      result := core.io.result
+    }
+    is (Ops.sub) {
+      result := core.io.result
+    }
+    is (Ops.sbc) {
+      result := core.io.result
+    }
+    is (Ops.and) {
+      result := io.a & io.b
+    }
+    is (Ops.xor) {
+      result := io.a ^ io.b
+    }
+    is (Ops.or) {
+      result := io.a | io.b
+    }
+    is (Ops.cp) {
+      result := core.io.result
+    }
+  }
+
   // set outputs
-  io.result := core.io.result
+  io.result := result
   io.flagsOut := flagsOut.asUInt()
 }
