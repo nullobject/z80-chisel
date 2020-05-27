@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 
 /**
- * This module adds or subtracts two numbers, with carry in and carry out bits.
+ * Performs an addition or subtraction operation with two 8-bit values, including carry in and out bits.
  */
 class Core extends Module {
   val io = IO(new Bundle {

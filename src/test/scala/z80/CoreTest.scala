@@ -9,7 +9,6 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   it should "add the inputs" in {
     test(new Core) { c =>
-      c.io.subtract.poke(0.U)
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
       c.io.carryIn.poke(0.U)
@@ -21,7 +20,6 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   it should "add the inputs with the carry bit" in {
     test(new Core) { c =>
-      c.io.subtract.poke(0.U)
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
       c.io.carryIn.poke(1.U)
@@ -33,7 +31,6 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   it should "set the half-carry bit" in {
     test(new Core) { c =>
-      c.io.subtract.poke(0.U)
       c.io.a.poke(15.U)
       c.io.b.poke(1.U)
       c.io.carryIn.poke(0.U)
@@ -45,7 +42,6 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   it should "set the carry bit" in {
     test(new Core) { c =>
-      c.io.subtract.poke(0.U)
       c.io.a.poke(255.U)
       c.io.b.poke(1.U)
       c.io.carryIn.poke(0.U)

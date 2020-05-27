@@ -37,33 +37,32 @@ class ALU extends Module {
     val flagsOut = Output(Bits(8.W))
   })
 
-  val result = WireDefault(0.U(8.W))
   val flagsIn = io.flagsIn.asTypeOf(new Flags)
   val flagsOut = io.flagsIn.asTypeOf(new Flags)
+  val result = WireDefault(0.U(8.W))
 
+  // arithmetic core for addition/subtraction
   val core = Module(new Core)
-  core.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
+  core.io.subtract := 0.U
   core.io.a := io.a
   core.io.b := io.b
-  core.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
-
-  // set flags
-  flagsOut.zero := result === 0.U
-  flagsOut.half := core.io.halfCarryOut
-  flagsOut.subtract := core.io.subtract
-  flagsOut.carry := core.io.carryOut
+  core.io.carryIn := 0.U
 
   switch (io.op) {
     is (Ops.add) {
       result := core.io.result
     }
     is (Ops.adc) {
+      core.io.carryIn := flagsIn.carry
       result := core.io.result
     }
     is (Ops.sub) {
+      core.io.subtract := 1.U
       result := core.io.result
     }
     is (Ops.sbc) {
+      core.io.subtract := 1.U
+      core.io.carryIn := flagsIn.carry
       result := core.io.result
     }
     is (Ops.and) {
@@ -76,9 +75,16 @@ class ALU extends Module {
       result := io.a | io.b
     }
     is (Ops.cp) {
+      core.io.subtract := 1.U
       result := core.io.result
     }
   }
+
+  // set flags
+  flagsOut.zero := result === 0.U
+  flagsOut.half := core.io.halfCarryOut
+  flagsOut.subtract := core.io.subtract
+  flagsOut.carry := core.io.carryOut
 
   // set outputs
   io.result := result
