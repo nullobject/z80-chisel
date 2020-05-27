@@ -385,7 +385,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(1.U)
       c.io.b.poke(0.U)
       c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0101_0000".U)
+      c.io.flagsOut.expect("b0101_0100".U)
     }
   }
 
@@ -418,7 +418,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(1.U)
       c.io.b.poke(1.U)
       c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -451,7 +451,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(0.U)
       c.io.b.poke(0.U)
       c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 

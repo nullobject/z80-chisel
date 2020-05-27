@@ -81,14 +81,14 @@ class ALU extends Module {
   val flagsOut = Wire(new Flags)
 
   val overflow = (io.a(7) && io.b(7) && !result(7)) || (!io.a(7) && !io.b(7) && result(7))
-  val parity = result.xorR()
+  val parity = !result.xorR()
 
   // arithmetic core for addition/subtraction
   val core = Module(new Core)
-  core.io.subtract := flagsOut.subtract
+  core.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
   core.io.a := io.a
   core.io.b := io.b
-  core.io.carryIn := 0.U
+  core.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
 
   // default flags
   flagsOut.sign := result(7)
@@ -97,7 +97,7 @@ class ALU extends Module {
   flagsOut.halfCarry := 0.U
   flagsOut.unused1 := 0.U
   flagsOut.overflow := 0.U
-  flagsOut.subtract := 0.U
+  flagsOut.subtract := core.io.subtract
   flagsOut.carry := 0.U
 
   switch (io.op) {
@@ -108,7 +108,6 @@ class ALU extends Module {
       flagsOut.carry := core.io.carryOut
     }
     is (Ops.adc) {
-      core.io.carryIn := flagsIn.carry
       result := core.io.result
       flagsOut.halfCarry := core.io.halfCarryOut
       flagsOut.overflow := overflow
@@ -118,22 +117,18 @@ class ALU extends Module {
       result := core.io.result
       flagsOut.halfCarry := core.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.subtract := 1.U
       flagsOut.carry := core.io.carryOut
     }
     is (Ops.sbc) {
-      core.io.carryIn := flagsIn.carry
       result := core.io.result
       flagsOut.halfCarry := core.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.subtract := 1.U
       flagsOut.carry := core.io.carryOut
     }
     is (Ops.cp) {
       result := core.io.result
       flagsOut.halfCarry := core.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.subtract := 1.U
       flagsOut.carry := core.io.carryOut
     }
     is (Ops.and) {
