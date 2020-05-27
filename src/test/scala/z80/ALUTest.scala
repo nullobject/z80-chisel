@@ -234,4 +234,122 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.flagsOut.expect("b0001_0011".U)
     }
   }
+
+  behavior of "RL"
+
+  it should "rotate A left though carry" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rl)
+      c.io.a.poke("b0000_0001".U)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0011".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rl)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rl)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  behavior of "RLC"
+
+  it should "rotate A left circular" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rlc)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0010".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rlc)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b0000_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rlc)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  behavior of "RR"
+
+  it should "rotate A right through carry" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rr)
+      c.io.a.poke("b0000_0001".U)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b0000_0001".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rr)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rr)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  behavior of "RRC"
+
+  it should "rotate A right circular" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrc)
+      c.io.a.poke("b0000_0010".U)
+      c.io.result.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrc)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b0000_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrc)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
 }

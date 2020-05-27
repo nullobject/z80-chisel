@@ -7,7 +7,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val add :: adc :: sub :: sbc :: and :: xor :: or :: cp :: Nil = Enum(8)
+  val add :: adc :: sub :: sbc :: and :: xor :: or :: cp :: rl :: rlc :: rr :: rrc :: Nil = Enum(12)
 }
 
 /**
@@ -48,6 +48,12 @@ class ALU extends Module {
   core.io.b := io.b
   core.io.carryIn := 0.U
 
+  // set flags
+  flagsOut.zero := result === 0.U
+  flagsOut.half := core.io.halfCarryOut
+  flagsOut.subtract := core.io.subtract
+  flagsOut.carry := core.io.carryOut
+
   switch (io.op) {
     is (Ops.add) {
       result := core.io.result
@@ -78,13 +84,27 @@ class ALU extends Module {
       core.io.subtract := 1.U
       result := core.io.result
     }
+    is (Ops.rl) {
+      result := Cat(io.a(6, 0), flagsIn.carry)
+      flagsOut.carry := io.a(7)
+      flagsOut.half := 0.U
+    }
+    is (Ops.rlc) {
+      result := Cat(io.a(6, 0), io.a(7))
+      flagsOut.carry := io.a(7)
+      flagsOut.half := 0.U
+    }
+    is (Ops.rr) {
+      result := Cat(flagsIn.carry, io.a(7, 1))
+      flagsOut.carry := io.a(0)
+      flagsOut.half := 0.U
+    }
+    is (Ops.rrc) {
+      result := Cat(io.a(0), io.a(7, 1))
+      flagsOut.carry := io.a(0)
+      flagsOut.half := 0.U
+    }
   }
-
-  // set flags
-  flagsOut.zero := result === 0.U
-  flagsOut.half := core.io.halfCarryOut
-  flagsOut.subtract := core.io.subtract
-  flagsOut.carry := core.io.carryOut
 
   // set outputs
   io.result := result
