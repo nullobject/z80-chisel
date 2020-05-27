@@ -44,24 +44,34 @@ import org.scalatest._
 class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "ADD"
 
-  it should "add the inputs without carry" in {
+  it should "add the inputs (without carry)" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.add)
       c.io.a.poke(2.U)
       c.io.b.poke(1.U)
-      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.flagsIn.poke("b0000_0011".U)
       c.io.result.expect(3.U)
       c.io.flagsOut.expect("b0000_0000".U)
     }
   }
 
-  it should "set the carry flag" in {
+  it should "set the sign flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.add)
-      c.io.a.poke(255.U)
-      c.io.b.poke(1.U)
+      c.io.a.poke(128.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.add)
+      c.io.a.poke(0.U)
+      c.io.b.poke(0.U)
       c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0101_0001".U)
+      c.io.flagsOut.expect("b0100_0000".U)
     }
   }
 
@@ -75,46 +85,46 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the zero flag" in {
+  it should "set the overflow flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.add)
-      c.io.a.poke(0.U)
-      c.io.b.poke(0.U)
+      c.io.a.poke(64.U)
+      c.io.b.poke(64.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0100".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.add)
+      c.io.a.poke(255.U)
+      c.io.b.poke(1.U)
       c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0101_0001".U)
     }
   }
 
   behavior of "ADC"
 
-  it should "add the inputs with carry" in {
+  it should "add the inputs (with carry)" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.adc)
       c.io.a.poke(2.U)
       c.io.b.poke(1.U)
-      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.flagsIn.poke("b0000_0011".U)
       c.io.result.expect(4.U)
       c.io.flagsOut.expect("b0000_0000".U)
     }
   }
 
-  it should "set the carry flag" in {
+  it should "set the sign flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.adc)
-      c.io.a.poke(255.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0101_0001".U)
-    }
-  }
-
-  it should "set the half-carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.adc)
-      c.io.a.poke(15.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(16.U)
-      c.io.flagsOut.expect("b0001_0000".U)
+      c.io.a.poke(128.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0000".U)
     }
   }
 
@@ -128,9 +138,39 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  it should "set the half-carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.adc)
+      c.io.a.poke(15.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(16.U)
+      c.io.flagsOut.expect("b0001_0000".U)
+    }
+  }
+
+  it should "set the overflow flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.adc)
+      c.io.a.poke(64.U)
+      c.io.b.poke(64.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0100".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.adc)
+      c.io.a.poke(255.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0101_0001".U)
+    }
+  }
+
   behavior of "SUB"
 
-  it should "subtract the inputs without carry" in {
+  it should "subtract the inputs (without carry)" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sub)
       c.io.a.poke(2.U)
@@ -141,23 +181,13 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
+  it should "set the sign flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sub)
       c.io.a.poke(0.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(255.U)
-      c.io.flagsOut.expect("b0001_0011".U)
-    }
-  }
-
-  it should "set the half-carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.sub)
-      c.io.a.poke(16.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(15.U)
-      c.io.flagsOut.expect("b0001_0010".U)
+      c.io.b.poke(128.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0011".U)
     }
   }
 
@@ -171,9 +201,39 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  it should "set the half-carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sub)
+      c.io.a.poke(16.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(15.U)
+      c.io.flagsOut.expect("b0001_0010".U)
+    }
+  }
+
+  it should "set the overflow flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sub)
+      c.io.a.poke(0.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(255.U)
+      c.io.flagsOut.expect("b1001_0111".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sub)
+      c.io.a.poke(0.U)
+      c.io.b.poke(192.U)
+      c.io.result.expect(64.U)
+      c.io.flagsOut.expect("b0000_0011".U)
+    }
+  }
+
   behavior of "SBC"
 
-  it should "subtract the inputs with carry" in {
+  it should "subtract the inputs (with carry)" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sbc)
       c.io.a.poke(2.U)
@@ -184,13 +244,23 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
+  it should "set the sign flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sbc)
       c.io.a.poke(0.U)
+      c.io.b.poke(128.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0011".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sbc)
+      c.io.a.poke(1.U)
       c.io.b.poke(1.U)
-      c.io.result.expect(255.U)
-      c.io.flagsOut.expect("b0001_0011".U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0100_0010".U)
     }
   }
 
@@ -204,13 +274,85 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the zero flag" in {
+  it should "set the overflow flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sbc)
+      c.io.a.poke(0.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(255.U)
+      c.io.flagsOut.expect("b1001_0111".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sbc)
+      c.io.a.poke(0.U)
+      c.io.b.poke(192.U)
+      c.io.result.expect(64.U)
+      c.io.flagsOut.expect("b0000_0011".U)
+    }
+  }
+
+  behavior of "CP"
+
+  it should "compare the inputs" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(2.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0010".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(0.U)
+      c.io.b.poke(128.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0011".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
       c.io.a.poke(1.U)
       c.io.b.poke(1.U)
       c.io.result.expect(0.U)
       c.io.flagsOut.expect("b0100_0010".U)
+    }
+  }
+
+  it should "set the half-carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(16.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(15.U)
+      c.io.flagsOut.expect("b0001_0010".U)
+    }
+  }
+
+  it should "set the overflow flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(0.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(255.U)
+      c.io.flagsOut.expect("b1001_0111".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.cp)
+      c.io.a.poke(0.U)
+      c.io.b.poke(192.U)
+      c.io.result.expect(64.U)
+      c.io.flagsOut.expect("b0000_0011".U)
     }
   }
 
@@ -277,48 +419,6 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.b.poke(0.U)
       c.io.result.expect(0.U)
       c.io.flagsOut.expect("b0100_0000".U)
-    }
-  }
-
-  behavior of "CP"
-
-  it should "compare the inputs" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.cp)
-      c.io.a.poke(2.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(1.U)
-      c.io.flagsOut.expect("b0000_0010".U)
-    }
-  }
-
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.cp)
-      c.io.a.poke(0.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(255.U)
-      c.io.flagsOut.expect("b0001_0011".U)
-    }
-  }
-
-  it should "set the half-carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.cp)
-      c.io.a.poke(16.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(15.U)
-      c.io.flagsOut.expect("b0001_0010".U)
-    }
-  }
-
-  it should "set the zero flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.cp)
-      c.io.a.poke(1.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0010".U)
     }
   }
 
