@@ -5,7 +5,9 @@ import chiseltest._
 import org.scalatest._
 
 class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
-  "An add operation" should "add the inputs" in {
+  behavior of "An add operation"
+
+  it should "add the inputs" in {
     test(new Core) { c =>
       c.io.subtract.poke(0.U)
       c.io.a.poke(3.U)
@@ -53,7 +55,9 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  "A subtract operation" should "subtract the inputs" in {
+  behavior of "A subtract operation"
+
+  it should "subtract the inputs" in {
     test(new Core) { c =>
       c.io.subtract.poke(1.U)
       c.io.a.poke(3.U)
