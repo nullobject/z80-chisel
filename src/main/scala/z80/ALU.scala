@@ -37,43 +37,22 @@ class ALU extends Module {
     val flagsOut = Output(Bits(8.W))
   })
 
-  val result = WireDefault(0.U(9.W))
   val flagsIn = io.flagsIn.asTypeOf(new Flags)
   val flagsOut = io.flagsIn.asTypeOf(new Flags)
 
+  val core = Module(new Core)
+  core.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
+  core.io.a := io.a
+  core.io.b := io.b
+  core.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
+
   // set flags
-  flagsOut.zero := result(7, 0) === 0.U
-  flagsOut.carry := result(8)
+  flagsOut.zero := core.io.result === 0.U
+  flagsOut.half := core.io.halfCarryOut
+  flagsOut.subtract := core.io.subtract
+  flagsOut.carry := core.io.carryOut
 
-  switch (io.op) {
-    is (Ops.add) {
-      result := io.a +& io.b
-      flagsOut.half := (io.a(3, 0) +& io.b(3, 0))(4)
-    }
-    is (Ops.adc) {
-      result := io.a +& io.b + flagsIn.carry
-      flagsOut.half := (io.a(3, 0) +& io.b(3, 0))(4)
-    }
-    is (Ops.sub) {
-      result := io.a -& io.b
-      flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
-      flagsOut.subtract := 1.U
-    }
-    is (Ops.sbc) {
-      result := io.a -& io.b - flagsIn.carry
-      flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
-      flagsOut.subtract := 1.U
-    }
-    is (Ops.and) {}
-    is (Ops.xor) {}
-    is (Ops.or) {}
-    is (Ops.cp) {
-      result := io.a -& io.b
-      flagsOut.half := (io.a(3, 0) -& io.b(3, 0))(4)
-      flagsOut.subtract := 1.U
-    }
-  }
-
-  io.result := result(7, 0)
+  // set outputs
+  io.result := core.io.result
   io.flagsOut := flagsOut.asUInt()
 }
