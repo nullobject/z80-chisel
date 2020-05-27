@@ -74,108 +74,128 @@ class ALU extends Module {
     val flagsOut = Output(Bits(8.W))
   })
 
-  val flagsIn = io.flagsIn.asTypeOf(new Flags)
-  val flagsOut = io.flagsIn.asTypeOf(new Flags)
   val result = WireDefault(0.U(8.W))
+
+  // flags
+  val flagsIn = io.flagsIn.asTypeOf(new Flags)
+  val flagsOut = Wire(new Flags)
+
+  val overflow = (io.a(7) && io.b(7) && !result(7)) || (!io.a(7) && !io.b(7) && result(7))
+  val parity = result.xorR()
 
   // arithmetic core for addition/subtraction
   val core = Module(new Core)
-  core.io.subtract := 0.U
+  core.io.subtract := flagsOut.subtract
   core.io.a := io.a
   core.io.b := io.b
   core.io.carryIn := 0.U
 
-  // set flags
+  // default flags
   flagsOut.sign := result(7)
   flagsOut.zero := result === 0.U
-  flagsOut.halfCarry := core.io.halfCarryOut
-  flagsOut.overflow := (io.a(7) && io.b(7) && !result(7)) || (!io.a(7) && !io.b(7) && result(7))
-  flagsOut.subtract := core.io.subtract
-  flagsOut.carry := core.io.carryOut
+  flagsOut.unused2 := 0.U
+  flagsOut.halfCarry := 0.U
+  flagsOut.unused1 := 0.U
+  flagsOut.overflow := 0.U
+  flagsOut.subtract := 0.U
+  flagsOut.carry := 0.U
 
   switch (io.op) {
     is (Ops.add) {
       result := core.io.result
+      flagsOut.halfCarry := core.io.halfCarryOut
+      flagsOut.overflow := overflow
+      flagsOut.carry := core.io.carryOut
     }
     is (Ops.adc) {
       core.io.carryIn := flagsIn.carry
       result := core.io.result
+      flagsOut.halfCarry := core.io.halfCarryOut
+      flagsOut.overflow := overflow
+      flagsOut.carry := core.io.carryOut
     }
     is (Ops.sub) {
-      core.io.subtract := 1.U
       result := core.io.result
+      flagsOut.halfCarry := core.io.halfCarryOut
+      flagsOut.overflow := overflow
+      flagsOut.subtract := 1.U
+      flagsOut.carry := core.io.carryOut
     }
     is (Ops.sbc) {
-      core.io.subtract := 1.U
       core.io.carryIn := flagsIn.carry
       result := core.io.result
+      flagsOut.halfCarry := core.io.halfCarryOut
+      flagsOut.overflow := overflow
+      flagsOut.subtract := 1.U
+      flagsOut.carry := core.io.carryOut
     }
     is (Ops.cp) {
-      core.io.subtract := 1.U
       result := core.io.result
+      flagsOut.halfCarry := core.io.halfCarryOut
+      flagsOut.overflow := overflow
+      flagsOut.subtract := 1.U
+      flagsOut.carry := core.io.carryOut
     }
     is (Ops.and) {
       result := io.a & io.b
-      flagsOut.carry := 0.U
       flagsOut.halfCarry := 1.U
+      flagsOut.overflow := parity
     }
     is (Ops.xor) {
       result := io.a ^ io.b
-      flagsOut.carry := 0.U
-      flagsOut.halfCarry := 0.U
+      flagsOut.overflow := parity
     }
     is (Ops.or) {
       result := io.a | io.b
-      flagsOut.carry := 0.U
-      flagsOut.halfCarry := 0.U
+      flagsOut.overflow := parity
     }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.rlc) {
       result := Cat(io.a(6, 0), io.a(7))
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.rr) {
       result := Cat(flagsIn.carry, io.a(7, 1))
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.rrc) {
       result := Cat(io.a(0), io.a(7, 1))
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.sla) {
       result := Cat(io.a(6, 0), 0.U)
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.sll) {
       result := Cat(io.a(6, 0), 1.U)
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.sra) {
       result := Cat(io.a(7), io.a(7, 1))
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.srl) {
       result := Cat(0.U, io.a(7, 1))
+      flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
-      flagsOut.halfCarry := 0.U
     }
     is (Ops.rld) {
       result := Cat(io.a(7, 4), io.b(7, 4))
-      flagsOut.halfCarry := 0.U
+      flagsOut.overflow := parity
     }
     is (Ops.rrd) {
       result := Cat(io.a(7, 4), io.b(3, 0))
-      flagsOut.halfCarry := 0.U
+      flagsOut.overflow := parity
     }
   }
 
