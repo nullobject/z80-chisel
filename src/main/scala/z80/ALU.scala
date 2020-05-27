@@ -7,7 +7,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val add :: adc :: sub :: sbc :: and :: xor :: or :: cp :: rl :: rlc :: rr :: rrc :: Nil = Enum(12)
+  val add :: adc :: sub :: sbc :: and :: xor :: or :: cp :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: Nil = Enum(16)
 }
 
 /**
@@ -101,6 +101,26 @@ class ALU extends Module {
     }
     is (Ops.rrc) {
       result := Cat(io.a(0), io.a(7, 1))
+      flagsOut.carry := io.a(0)
+      flagsOut.half := 0.U
+    }
+    is (Ops.sla) {
+      result := Cat(io.a(6, 0), 0.U)
+      flagsOut.carry := io.a(7)
+      flagsOut.half := 0.U
+    }
+    is (Ops.sll) {
+      result := Cat(io.a(6, 0), 1.U)
+      flagsOut.carry := io.a(7)
+      flagsOut.half := 0.U
+    }
+    is (Ops.sra) {
+      result := Cat(io.a(7), io.a(7, 1))
+      flagsOut.carry := io.a(0)
+      flagsOut.half := 0.U
+    }
+    is (Ops.srl) {
+      result := Cat(0.U, io.a(7, 1))
       flagsOut.carry := io.a(0)
       flagsOut.half := 0.U
     }

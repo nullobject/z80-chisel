@@ -352,4 +352,112 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.flagsOut.expect("b0100_0000".U)
     }
   }
+
+  behavior of "SLA"
+
+  it should "shift A left arithmetic" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sla)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0010".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sla)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sla)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  behavior of "SLL"
+
+  it should "shift A left logical" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sll)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0011".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sll)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b0000_0001".U)
+    }
+  }
+
+  behavior of "SRA"
+
+  it should "shift A right arithmetic" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sra)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b1100_0000".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sra)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sra)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  behavior of "SRL"
+
+  it should "shift A right logical" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.srl)
+      c.io.a.poke("b1000_0000".U)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.srl)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.srl)
+      c.io.a.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
 }
