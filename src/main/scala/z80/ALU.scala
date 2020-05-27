@@ -44,7 +44,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val add :: adc :: sub :: sbc :: and :: xor :: or :: cp :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: Nil = Enum(16)
+  val add :: adc :: sub :: sbc :: cp :: and :: xor :: or :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil = Enum(18)
 }
 
 /**
@@ -66,7 +66,7 @@ class Flags extends Bundle {
  */
 class ALU extends Module {
   val io = IO(new Bundle {
-    val op = Input(UInt(4.W))
+    val op = Input(UInt(5.W))
     val a = Input(UInt(8.W))
     val b = Input(UInt(8.W))
     val flagsIn = Input(Bits(8.W))
@@ -108,6 +108,10 @@ class ALU extends Module {
       core.io.carryIn := flagsIn.carry
       result := core.io.result
     }
+    is (Ops.cp) {
+      core.io.subtract := 1.U
+      result := core.io.result
+    }
     is (Ops.and) {
       result := io.a & io.b
     }
@@ -116,10 +120,6 @@ class ALU extends Module {
     }
     is (Ops.or) {
       result := io.a | io.b
-    }
-    is (Ops.cp) {
-      core.io.subtract := 1.U
-      result := core.io.result
     }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)
@@ -159,6 +159,14 @@ class ALU extends Module {
     is (Ops.srl) {
       result := Cat(0.U, io.a(7, 1))
       flagsOut.carry := io.a(0)
+      flagsOut.half := 0.U
+    }
+    is (Ops.rld) {
+      result := Cat(io.a(7, 4), io.b(7, 4))
+      flagsOut.half := 0.U
+    }
+    is (Ops.rrd) {
+      result := Cat(io.a(7, 4), io.b(3, 0))
       flagsOut.half := 0.U
     }
   }

@@ -497,4 +497,28 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.flagsOut.expect("b0100_0000".U)
     }
   }
+
+  behavior of "RLD"
+
+  it should "rotate one BCD digit between A and B" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rld)
+      c.io.a.poke("b1000_0000".U)
+      c.io.b.poke("b0001_0000".U)
+      c.io.result.expect("b1000_0001".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  behavior of "RRD"
+
+  it should "rotate one BCD digit between A and B" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrd)
+      c.io.a.poke("b1000_0000".U)
+      c.io.b.poke("b0000_0001".U)
+      c.io.result.expect("b1000_0001".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
 }
