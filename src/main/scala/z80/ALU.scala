@@ -56,7 +56,7 @@ class Flags extends Bundle {
   val unused2 = UInt(1.W)
   val halfCarry = UInt(1.W)
   val unused1 = UInt(1.W)
-  val parity = UInt(1.W)
+  val overflow = UInt(1.W)
   val subtract = UInt(1.W)
   val carry = UInt(1.W)
 }
