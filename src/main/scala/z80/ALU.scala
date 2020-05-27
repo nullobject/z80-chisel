@@ -116,12 +116,18 @@ class ALU extends Module {
     }
     is (Ops.and) {
       result := io.a & io.b
+      flagsOut.carry := 0.U
+      flagsOut.halfCarry := 1.U
     }
     is (Ops.xor) {
       result := io.a ^ io.b
+      flagsOut.carry := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.or) {
       result := io.a | io.b
+      flagsOut.carry := 0.U
+      flagsOut.halfCarry := 0.U
     }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)

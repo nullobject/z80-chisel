@@ -363,8 +363,19 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.and)
       c.io.a.poke(1.U)
       c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0011".U)
       c.io.result.expect(1.U)
-      c.io.flagsOut.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0001_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.and)
+      c.io.a.poke(128.U)
+      c.io.b.poke(128.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1001_0000".U)
     }
   }
 
@@ -374,7 +385,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(1.U)
       c.io.b.poke(0.U)
       c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0101_0000".U)
     }
   }
 
@@ -385,8 +396,19 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.xor)
       c.io.a.poke(1.U)
       c.io.b.poke(0.U)
+      c.io.flagsIn.poke("b0000_0011".U)
       c.io.result.expect(1.U)
       c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.xor)
+      c.io.a.poke(128.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0000".U)
     }
   }
 
@@ -407,8 +429,19 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.or)
       c.io.a.poke(1.U)
       c.io.b.poke(0.U)
+      c.io.flagsIn.poke("b0000_0011".U)
       c.io.result.expect(1.U)
       c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.or)
+      c.io.a.poke(128.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0000".U)
     }
   }
 
@@ -434,21 +467,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.rl)
-      c.io.a.poke("b1000_0000".U)
-      c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
-    }
-  }
-
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rl)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rl)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
     }
   }
 
@@ -463,21 +496,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.rlc)
-      c.io.a.poke("b1000_0000".U)
-      c.io.result.expect("b0000_0001".U)
-      c.io.flagsOut.expect("b0000_0001".U)
-    }
-  }
-
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rlc)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rlc)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b0000_0001".U)
     }
   }
 
@@ -489,16 +522,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke("b0000_0001".U)
       c.io.flagsIn.poke("b0000_0001".U)
       c.io.result.expect("b1000_0000".U)
-      c.io.flagsOut.expect("b0000_0001".U)
-    }
-  }
-
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.rr)
-      c.io.a.poke("b0000_0001".U)
-      c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
+      c.io.flagsOut.expect("b1000_0001".U)
     }
   }
 
@@ -508,6 +532,15 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rr)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
     }
   }
 
@@ -522,21 +555,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.rrc)
-      c.io.a.poke("b0000_0001".U)
-      c.io.result.expect("b1000_0000".U)
-      c.io.flagsOut.expect("b0000_0001".U)
-    }
-  }
-
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rrc)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrc)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b0000_0001".U)
     }
   }
 
@@ -551,21 +584,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.sla)
-      c.io.a.poke("b1000_0000".U)
-      c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
-    }
-  }
-
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sla)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sla)
+      c.io.a.poke("b1000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
     }
   }
 
@@ -600,21 +633,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.sra)
-      c.io.a.poke("b0000_0001".U)
-      c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
-    }
-  }
-
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sra)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sra)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
     }
   }
 
@@ -630,21 +663,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  it should "set the carry flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.srl)
-      c.io.a.poke("b0000_0001".U)
-      c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
-    }
-  }
-
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.srl)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
       c.io.flagsOut.expect("b0100_0000".U)
+    }
+  }
+
+  it should "set the carry flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.srl)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0001".U)
     }
   }
 
