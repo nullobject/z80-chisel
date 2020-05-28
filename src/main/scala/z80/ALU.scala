@@ -75,6 +75,11 @@ class ALU extends Module {
     val flagsOut = Output(Bits(8.W))
   })
 
+  /**
+   * Calculates the bitmask for a given number.
+   */
+  def bitmask(n: UInt) = (1.U << n).asUInt()
+
   val result = WireDefault(0.U(8.W))
 
   // flags
@@ -92,7 +97,7 @@ class ALU extends Module {
   adder.io.carryIn := flagsIn.carry && (io.op === Ops.adc || io.op === Ops.sbc)
 
   // default flags
-  flagsOut.sign := result(7)
+  flagsOut.sign := false.B
   flagsOut.zero := result === 0.U
   flagsOut.unused2 := false.B
   flagsOut.halfCarry := false.B
@@ -104,99 +109,121 @@ class ALU extends Module {
   switch (io.op) {
     is (Ops.add) {
       result := adder.io.result
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
     is (Ops.adc) {
       result := adder.io.result
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
     is (Ops.sub) {
       result := adder.io.result
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
     is (Ops.sbc) {
       result := adder.io.result
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
     is (Ops.and) {
       result := io.a & io.b
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := true.B
       flagsOut.overflow := parity
     }
     is (Ops.xor) {
       result := io.a ^ io.b
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
     is (Ops.or) {
       result := io.a | io.b
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
     is (Ops.cp) {
       result := adder.io.result
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
     is (Ops.bit) {
-      result := io.a & (1.U << io.b(2, 0))
+      result := io.a & bitmask(io.b(2, 0))
+      flagsOut.sign := result(7)
       flagsOut.halfCarry := true.B
       flagsOut.overflow := parity
       flagsOut.carry := flagsIn.carry
     }
+    is (Ops.set) {
+      result := io.a | bitmask(io.b(2, 0))
+    }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.rlc) {
       result := Cat(io.a(6, 0), io.a(7))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.rr) {
       result := Cat(flagsIn.carry, io.a(7, 1))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.rrc) {
       result := Cat(io.a(0), io.a(7, 1))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.sla) {
       result := Cat(io.a(6, 0), 0.U)
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.sll) {
       result := Cat(io.a(6, 0), 1.U)
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.sra) {
       result := Cat(io.a(7), io.a(7, 1))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.srl) {
       result := Cat(0.U, io.a(7, 1))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.rld) {
       result := Cat(io.a(7, 4), io.b(7, 4))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
     is (Ops.rrd) {
       result := Cat(io.a(7, 4), io.b(3, 0))
+      flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
   }

@@ -77,7 +77,7 @@ class Decoder extends Module {
     val b = Output(UInt(4.W))
   })
 
-  def decodeMicrocode(microcode: Microcode): Unit = {
+  def decodeMicrocode(microcode: Microcode) = {
     io.op := microcode.op
     microcode.a match {
       case Some(i) => {
