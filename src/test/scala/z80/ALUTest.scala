@@ -455,6 +455,46 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  behavior of "BIT"
+
+  it should "test the specified bit" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.bit)
+      c.io.a.poke("b0000_0001".U)
+      c.io.b.poke(0.U)
+      c.io.result.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b0001_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.bit)
+      c.io.a.poke("b1000_0000".U)
+      c.io.b.poke(7.U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b1001_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.bit)
+      c.io.a.poke("b0000_0001".U)
+      c.io.b.poke(1.U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0101_0100".U)
+    }
+  }
+
+  it should "leave the carry flag unchanged" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.bit)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.flagsOut.expect("b0101_0101".U)
+    }
+  }
+
   behavior of "RL"
 
   it should "rotate A left though carry" in {

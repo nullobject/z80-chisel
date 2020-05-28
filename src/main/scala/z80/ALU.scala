@@ -145,6 +145,12 @@ class ALU extends Module {
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
+    is (Ops.bit) {
+      result := io.a & (1.U << io.b(2, 0))
+      flagsOut.halfCarry := true.B
+      flagsOut.overflow := parity
+      flagsOut.carry := flagsIn.carry
+    }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)
       flagsOut.overflow := parity
