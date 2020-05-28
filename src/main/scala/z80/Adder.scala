@@ -43,7 +43,7 @@ import chisel3.util._
 /**
  * Performs an addition or subtraction operation with two 8-bit values, including carry in and out bits.
  */
-class Core extends Module {
+class Adder extends Module {
   val io = IO(new Bundle {
     val subtract = Input(UInt(1.W))
     val a = Input(UInt(8.W))

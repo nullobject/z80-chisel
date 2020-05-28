@@ -84,11 +84,11 @@ class ALU extends Module {
   val parity = !result.xorR()
 
   // arithmetic core for addition/subtraction
-  val core = Module(new Core)
-  core.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
-  core.io.a := io.a
-  core.io.b := io.b
-  core.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
+  val adder = Module(new Adder)
+  adder.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
+  adder.io.a := io.a
+  adder.io.b := io.b
+  adder.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
 
   // default flags
   flagsOut.sign := result(7)
@@ -97,39 +97,39 @@ class ALU extends Module {
   flagsOut.halfCarry := 0.U
   flagsOut.unused1 := 0.U
   flagsOut.overflow := 0.U
-  flagsOut.subtract := core.io.subtract
+  flagsOut.subtract := adder.io.subtract
   flagsOut.carry := 0.U
 
   switch (io.op) {
     is (Ops.add) {
-      result := core.io.result
-      flagsOut.halfCarry := core.io.halfCarryOut
+      result := adder.io.result
+      flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.carry := core.io.carryOut
+      flagsOut.carry := adder.io.carryOut
     }
     is (Ops.adc) {
-      result := core.io.result
-      flagsOut.halfCarry := core.io.halfCarryOut
+      result := adder.io.result
+      flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.carry := core.io.carryOut
+      flagsOut.carry := adder.io.carryOut
     }
     is (Ops.sub) {
-      result := core.io.result
-      flagsOut.halfCarry := core.io.halfCarryOut
+      result := adder.io.result
+      flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.carry := core.io.carryOut
+      flagsOut.carry := adder.io.carryOut
     }
     is (Ops.sbc) {
-      result := core.io.result
-      flagsOut.halfCarry := core.io.halfCarryOut
+      result := adder.io.result
+      flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.carry := core.io.carryOut
+      flagsOut.carry := adder.io.carryOut
     }
     is (Ops.cp) {
-      result := core.io.result
-      flagsOut.halfCarry := core.io.halfCarryOut
+      result := adder.io.result
+      flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
-      flagsOut.carry := core.io.carryOut
+      flagsOut.carry := adder.io.carryOut
     }
     is (Ops.and) {
       result := io.a & io.b

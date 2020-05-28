@@ -41,11 +41,11 @@ import chisel3._
 import chiseltest._
 import org.scalatest._
 
-class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
+class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "An add operation"
 
   it should "add the inputs" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
       c.io.carryIn.poke(0.U)
@@ -56,7 +56,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   }
 
   it should "add the inputs with the carry bit" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
       c.io.carryIn.poke(1.U)
@@ -67,7 +67,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   }
 
   it should "set the half-carry bit" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.a.poke(15.U)
       c.io.b.poke(1.U)
       c.io.carryIn.poke(0.U)
@@ -78,7 +78,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   }
 
   it should "set the carry bit" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.a.poke(255.U)
       c.io.b.poke(1.U)
       c.io.carryIn.poke(0.U)
@@ -91,7 +91,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "A subtract operation"
 
   it should "subtract the inputs" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.subtract.poke(1.U)
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
@@ -103,7 +103,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   }
 
   it should "subtract the inputs with the carry bit" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.subtract.poke(1.U)
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
@@ -115,7 +115,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   }
 
   it should "set the half-carry bit" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.subtract.poke(1.U)
       c.io.a.poke(16.U)
       c.io.b.poke(1.U)
@@ -127,7 +127,7 @@ class CoreTest extends FlatSpec with ChiselScalatestTester with Matchers {
   }
 
   it should "set the carry bit" in {
-    test(new Core) { c =>
+    test(new Adder) { c =>
       c.io.subtract.poke(1.U)
       c.io.a.poke(0.U)
       c.io.b.poke(1.U)
