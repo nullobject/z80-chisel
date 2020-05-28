@@ -51,14 +51,14 @@ object Ops {
  * Processor flags
  */
 class Flags extends Bundle {
-  val sign = UInt(1.W)
-  val zero = UInt(1.W)
-  val unused2 = UInt(1.W)
-  val halfCarry = UInt(1.W)
-  val unused1 = UInt(1.W)
-  val overflow = UInt(1.W)
-  val subtract = UInt(1.W)
-  val carry = UInt(1.W)
+  val sign = Bool()
+  val zero = Bool()
+  val unused2 = Bool()
+  val halfCarry = Bool()
+  val unused1 = Bool()
+  val overflow = Bool()
+  val subtract = Bool()
+  val carry = Bool()
 }
 
 /**
@@ -88,17 +88,17 @@ class ALU extends Module {
   adder.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
   adder.io.a := io.a
   adder.io.b := io.b
-  adder.io.carryIn := flagsIn.carry.asBool() && (io.op === Ops.adc || io.op === Ops.sbc)
+  adder.io.carryIn := flagsIn.carry && (io.op === Ops.adc || io.op === Ops.sbc)
 
   // default flags
   flagsOut.sign := result(7)
   flagsOut.zero := result === 0.U
-  flagsOut.unused2 := 0.U
-  flagsOut.halfCarry := 0.U
-  flagsOut.unused1 := 0.U
-  flagsOut.overflow := 0.U
+  flagsOut.unused2 := false.B
+  flagsOut.halfCarry := false.B
+  flagsOut.unused1 := false.B
+  flagsOut.overflow := false.B
   flagsOut.subtract := adder.io.subtract
-  flagsOut.carry := 0.U
+  flagsOut.carry := false.B
 
   switch (io.op) {
     is (Ops.add) {
@@ -133,7 +133,7 @@ class ALU extends Module {
     }
     is (Ops.and) {
       result := io.a & io.b
-      flagsOut.halfCarry := 1.U
+      flagsOut.halfCarry := true.B
       flagsOut.overflow := parity
     }
     is (Ops.xor) {

@@ -49,8 +49,8 @@ class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
       c.io.result.expect(5.U)
-      c.io.halfCarryOut.expect(0.U)
-      c.io.carryOut.expect(0.U)
+      c.io.halfCarryOut.expect(false.B)
+      c.io.carryOut.expect(false.B)
     }
   }
 
@@ -58,10 +58,10 @@ class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new Adder) { c =>
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
-      c.io.carryIn.poke(1.U)
+      c.io.carryIn.poke(true.B)
       c.io.result.expect(6.U)
-      c.io.halfCarryOut.expect(0.U)
-      c.io.carryOut.expect(0.U)
+      c.io.halfCarryOut.expect(false.B)
+      c.io.carryOut.expect(false.B)
     }
   }
 
@@ -70,8 +70,8 @@ class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(15.U)
       c.io.b.poke(1.U)
       c.io.result.expect(16.U)
-      c.io.halfCarryOut.expect(1.U)
-      c.io.carryOut.expect(0.U)
+      c.io.halfCarryOut.expect(true.B)
+      c.io.carryOut.expect(false.B)
     }
   }
 
@@ -80,8 +80,8 @@ class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.a.poke(255.U)
       c.io.b.poke(1.U)
       c.io.result.expect(0.U)
-      c.io.halfCarryOut.expect(1.U)
-      c.io.carryOut.expect(1.U)
+      c.io.halfCarryOut.expect(true.B)
+      c.io.carryOut.expect(true.B)
     }
   }
 
@@ -89,46 +89,46 @@ class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   it should "subtract the inputs (without carry)" in {
     test(new Adder) { c =>
-      c.io.subtract.poke(1.U)
+      c.io.subtract.poke(true.B)
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
       c.io.result.expect(1.U)
-      c.io.halfCarryOut.expect(0.U)
-      c.io.carryOut.expect(0.U)
+      c.io.halfCarryOut.expect(false.B)
+      c.io.carryOut.expect(false.B)
     }
   }
 
   it should "subtract the inputs (with carry)" in {
     test(new Adder) { c =>
-      c.io.subtract.poke(1.U)
+      c.io.subtract.poke(true.B)
       c.io.a.poke(3.U)
       c.io.b.poke(2.U)
-      c.io.carryIn.poke(1.U)
+      c.io.carryIn.poke(true.B)
       c.io.result.expect(0.U)
-      c.io.halfCarryOut.expect(0.U)
-      c.io.carryOut.expect(0.U)
+      c.io.halfCarryOut.expect(false.B)
+      c.io.carryOut.expect(false.B)
     }
   }
 
   it should "set the half-carry flag" in {
     test(new Adder) { c =>
-      c.io.subtract.poke(1.U)
+      c.io.subtract.poke(true.B)
       c.io.a.poke(16.U)
       c.io.b.poke(1.U)
       c.io.result.expect(15.U)
-      c.io.halfCarryOut.expect(1.U)
-      c.io.carryOut.expect(0.U)
+      c.io.halfCarryOut.expect(true.B)
+      c.io.carryOut.expect(false.B)
     }
   }
 
   it should "set the carry flag" in {
     test(new Adder) { c =>
-      c.io.subtract.poke(1.U)
+      c.io.subtract.poke(true.B)
       c.io.a.poke(0.U)
       c.io.b.poke(1.U)
       c.io.result.expect(255.U)
-      c.io.halfCarryOut.expect(1.U)
-      c.io.carryOut.expect(1.U)
+      c.io.halfCarryOut.expect(true.B)
+      c.io.carryOut.expect(true.B)
     }
   }
 }

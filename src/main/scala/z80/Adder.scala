@@ -45,13 +45,13 @@ import chisel3.util._
  */
 class Adder extends Module {
   val io = IO(new Bundle {
-    val subtract = Input(UInt(1.W))
+    val subtract = Input(Bool())
     val a = Input(UInt(8.W))
     val b = Input(UInt(8.W))
-    val carryIn = Input(UInt(1.W))
+    val carryIn = Input(Bool())
     val result = Output(UInt(8.W))
-    val halfCarryOut= Output(UInt(1.W))
-    val carryOut= Output(UInt(1.W))
+    val halfCarryOut= Output(Bool())
+    val carryOut= Output(Bool())
   })
 
   val a = io.a
