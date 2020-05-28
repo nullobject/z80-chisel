@@ -44,7 +44,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val add :: adc :: sub :: sbc :: cp :: and :: xor :: or :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil = Enum(18)
+  val (add :: adc :: sub :: sbc :: and :: or :: xor :: cp :: bit :: set :: rst :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil ) = Enum(21)
 }
 
 /**
@@ -126,12 +126,6 @@ class ALU extends Module {
       flagsOut.overflow := overflow
       flagsOut.carry := adder.io.carryOut
     }
-    is (Ops.cp) {
-      result := adder.io.result
-      flagsOut.halfCarry := adder.io.halfCarryOut
-      flagsOut.overflow := overflow
-      flagsOut.carry := adder.io.carryOut
-    }
     is (Ops.and) {
       result := io.a & io.b
       flagsOut.halfCarry := true.B
@@ -144,6 +138,12 @@ class ALU extends Module {
     is (Ops.or) {
       result := io.a | io.b
       flagsOut.overflow := parity
+    }
+    is (Ops.cp) {
+      result := adder.io.result
+      flagsOut.halfCarry := adder.io.halfCarryOut
+      flagsOut.overflow := overflow
+      flagsOut.carry := adder.io.carryOut
     }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)

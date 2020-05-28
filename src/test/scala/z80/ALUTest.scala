@@ -294,6 +294,105 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  behavior of "AND"
+
+  it should "logical AND the inputs" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.and)
+      c.io.a.poke(1.U)
+      c.io.b.poke(1.U)
+      c.io.flagsIn.poke("b0000_0011".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0001_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.and)
+      c.io.a.poke(128.U)
+      c.io.b.poke(128.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1001_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.and)
+      c.io.a.poke(1.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0101_0100".U)
+    }
+  }
+
+  behavior of "OR"
+
+  it should "logical OR the inputs" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.or)
+      c.io.a.poke(1.U)
+      c.io.b.poke(0.U)
+      c.io.flagsIn.poke("b0000_0011".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.or)
+      c.io.a.poke(128.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.or)
+      c.io.a.poke(0.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0100_0100".U)
+    }
+  }
+
+  behavior of "XOR"
+
+  it should "logical XOR the inputs" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.xor)
+      c.io.a.poke(1.U)
+      c.io.b.poke(0.U)
+      c.io.flagsIn.poke("b0000_0011".U)
+      c.io.result.expect(1.U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.xor)
+      c.io.a.poke(128.U)
+      c.io.b.poke(0.U)
+      c.io.result.expect(128.U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.xor)
+      c.io.a.poke(1.U)
+      c.io.b.poke(1.U)
+      c.io.result.expect(0.U)
+      c.io.flagsOut.expect("b0100_0100".U)
+    }
+  }
+
   behavior of "CP"
 
   it should "compare the inputs" in {
@@ -353,105 +452,6 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.b.poke(192.U)
       c.io.result.expect(64.U)
       c.io.flagsOut.expect("b0000_0011".U)
-    }
-  }
-
-  behavior of "AND"
-
-  it should "logical AND the inputs" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.and)
-      c.io.a.poke(1.U)
-      c.io.b.poke(1.U)
-      c.io.flagsIn.poke("b0000_0011".U)
-      c.io.result.expect(1.U)
-      c.io.flagsOut.expect("b0001_0000".U)
-    }
-  }
-
-  it should "set the sign flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.and)
-      c.io.a.poke(128.U)
-      c.io.b.poke(128.U)
-      c.io.result.expect(128.U)
-      c.io.flagsOut.expect("b1001_0000".U)
-    }
-  }
-
-  it should "set the zero flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.and)
-      c.io.a.poke(1.U)
-      c.io.b.poke(0.U)
-      c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0101_0100".U)
-    }
-  }
-
-  behavior of "XOR"
-
-  it should "logical XOR the inputs" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.xor)
-      c.io.a.poke(1.U)
-      c.io.b.poke(0.U)
-      c.io.flagsIn.poke("b0000_0011".U)
-      c.io.result.expect(1.U)
-      c.io.flagsOut.expect("b0000_0000".U)
-    }
-  }
-
-  it should "set the sign flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.xor)
-      c.io.a.poke(128.U)
-      c.io.b.poke(0.U)
-      c.io.result.expect(128.U)
-      c.io.flagsOut.expect("b1000_0000".U)
-    }
-  }
-
-  it should "set the zero flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.xor)
-      c.io.a.poke(1.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0100".U)
-    }
-  }
-
-  behavior of "OR"
-
-  it should "logical OR the inputs" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.or)
-      c.io.a.poke(1.U)
-      c.io.b.poke(0.U)
-      c.io.flagsIn.poke("b0000_0011".U)
-      c.io.result.expect(1.U)
-      c.io.flagsOut.expect("b0000_0000".U)
-    }
-  }
-
-  it should "set the sign flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.or)
-      c.io.a.poke(128.U)
-      c.io.b.poke(0.U)
-      c.io.result.expect(128.U)
-      c.io.flagsOut.expect("b1000_0000".U)
-    }
-  }
-
-  it should "set the zero flag" in {
-    test(new ALU) { c =>
-      c.io.op.poke(Ops.or)
-      c.io.a.poke(0.U)
-      c.io.b.poke(0.U)
-      c.io.result.expect(0.U)
-      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
