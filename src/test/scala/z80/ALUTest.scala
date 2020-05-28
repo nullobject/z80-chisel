@@ -461,9 +461,18 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rl)
       c.io.a.poke("b0000_0001".U)
-      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.flagsIn.poke("b0001_0011".U)
       c.io.result.expect("b0000_0011".U)
-      c.io.flagsOut.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0000_0100".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rl)
+      c.io.a.poke("b0100_0000".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b1000_0000".U)
     }
   }
 
@@ -472,7 +481,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.rl)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -481,7 +490,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.rl)
       c.io.a.poke("b1000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
+      c.io.flagsOut.expect("b0100_0101".U)
     }
   }
 
@@ -496,12 +505,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rlc)
+      c.io.a.poke("b0100_0000".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rlc)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -526,12 +544,22 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rr)
+      c.io.a.poke("b0000_0000".U)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rr)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -540,7 +568,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.rr)
       c.io.a.poke("b0000_0001".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
+      c.io.flagsOut.expect("b0100_0101".U)
     }
   }
 
@@ -555,12 +583,21 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrc)
+      c.io.a.poke("b0000_0001".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b1000_0001".U)
+    }
+  }
+
   it should "set the zero flag" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rrc)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -569,7 +606,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.rrc)
       c.io.a.poke("b0000_0001".U)
       c.io.result.expect("b1000_0000".U)
-      c.io.flagsOut.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b1000_0001".U)
     }
   }
 
@@ -579,8 +616,18 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sla)
       c.io.a.poke("b0000_0001".U)
+      c.io.flagsIn.poke("b0000_0001".U)
       c.io.result.expect("b0000_0010".U)
       c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sla)
+      c.io.a.poke("b0100_0000".U)
+      c.io.result.expect("b1000_0000".U)
+      c.io.flagsOut.expect("b1000_0000".U)
     }
   }
 
@@ -589,7 +636,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.sla)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -598,7 +645,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.sla)
       c.io.a.poke("b1000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
+      c.io.flagsOut.expect("b0100_0101".U)
     }
   }
 
@@ -607,9 +654,19 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "shift A left logical" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sll)
-      c.io.a.poke("b0000_0001".U)
-      c.io.result.expect("b0000_0011".U)
+      c.io.a.poke("b0000_0000".U)
+      c.io.flagsIn.poke("b0000_0001".U)
+      c.io.result.expect("b0000_0001".U)
       c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sll)
+      c.io.a.poke("b0100_0000".U)
+      c.io.result.expect("b1000_0001".U)
+      c.io.flagsOut.expect("b1000_0100".U)
     }
   }
 
@@ -627,9 +684,18 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "shift A right arithmetic" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.sra)
+      c.io.a.poke("b0000_0010".U)
+      c.io.result.expect("b0000_0001".U)
+      c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.sra)
       c.io.a.poke("b1000_0000".U)
       c.io.result.expect("b1100_0000".U)
-      c.io.flagsOut.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b1000_0100".U)
     }
   }
 
@@ -638,7 +704,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.sra)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -647,7 +713,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.sra)
       c.io.a.poke("b0000_0001".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
+      c.io.flagsOut.expect("b0100_0101".U)
     }
   }
 
@@ -656,9 +722,9 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "shift A right logical" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.srl)
-      c.io.a.poke("b1000_0000".U)
+      c.io.a.poke("b0000_0010".U)
       c.io.flagsIn.poke("b0000_0001".U)
-      c.io.result.expect("b0100_0000".U)
+      c.io.result.expect("b0000_0001".U)
       c.io.flagsOut.expect("b0000_0000".U)
     }
   }
@@ -668,7 +734,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.srl)
       c.io.a.poke("b0000_0000".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -677,7 +743,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.op.poke(Ops.srl)
       c.io.a.poke("b0000_0001".U)
       c.io.result.expect("b0000_0000".U)
-      c.io.flagsOut.expect("b0100_0001".U)
+      c.io.flagsOut.expect("b0100_0101".U)
     }
   }
 
@@ -686,10 +752,30 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "rotate the upper BCD digit between A and B" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rld)
-      c.io.a.poke("b1000_0000".U)
+      c.io.a.poke("b0011_0000".U)
       c.io.b.poke("b0001_0000".U)
-      c.io.result.expect("b1000_0001".U)
+      c.io.result.expect("b0011_0001".U)
       c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rld)
+      c.io.a.poke("b1001_0000".U)
+      c.io.b.poke("b0001_0000".U)
+      c.io.result.expect("b1001_0001".U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rld)
+      c.io.a.poke("b0000_0000".U)
+      c.io.b.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 
@@ -698,10 +784,30 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "rotate the lower BCD digit between A and B" in {
     test(new ALU) { c =>
       c.io.op.poke(Ops.rrd)
-      c.io.a.poke("b1000_0000".U)
+      c.io.a.poke("b0011_0000".U)
       c.io.b.poke("b0000_0001".U)
-      c.io.result.expect("b1000_0001".U)
+      c.io.result.expect("b0011_0001".U)
       c.io.flagsOut.expect("b0000_0000".U)
+    }
+  }
+
+  it should "set the sign flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrd)
+      c.io.a.poke("b1001_0000".U)
+      c.io.b.poke("b0000_0001".U)
+      c.io.result.expect("b1001_0001".U)
+      c.io.flagsOut.expect("b1000_0000".U)
+    }
+  }
+
+  it should "set the zero flag" in {
+    test(new ALU) { c =>
+      c.io.op.poke(Ops.rrd)
+      c.io.a.poke("b0000_0000".U)
+      c.io.b.poke("b0000_0000".U)
+      c.io.result.expect("b0000_0000".U)
+      c.io.flagsOut.expect("b0100_0100".U)
     }
   }
 }
