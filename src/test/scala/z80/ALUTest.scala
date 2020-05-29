@@ -42,7 +42,7 @@ import chiseltest._
 import org.scalatest._
 
 class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
-  // test data value object
+  // ALU I/O value object
   case class Value(a: UInt, b: UInt, flagsIn: UInt, result: UInt, flagsOut: UInt)
 
   def testALU(op: UInt, value: Value, c: ALU) = {
@@ -88,716 +88,266 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-//  behavior of "SUB"
-//
-//  it should "subtract the inputs (without carry)" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sub)
-//      c.io.a.poke(2.U)
-//      c.io.b.poke(1.U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect(1.U)
-//      c.io.flagsOut.expect("b0000_0010".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sub)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(128.U)
-//      c.io.result.expect(128.U)
-//      c.io.flagsOut.expect("b1000_0011".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sub)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0100_0010".U)
-//    }
-//  }
-//
-//  it should "set the half-carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sub)
-//      c.io.a.poke(16.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(15.U)
-//      c.io.flagsOut.expect("b0001_0010".U)
-//    }
-//  }
-//
-//  it should "set the overflow flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sub)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(255.U)
-//      c.io.flagsOut.expect("b1001_0111".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sub)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(192.U)
-//      c.io.result.expect(64.U)
-//      c.io.flagsOut.expect("b0000_0011".U)
-//    }
-//  }
-//
-//  behavior of "SBC"
-//
-//  it should "subtract the inputs (with carry)" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sbc)
-//      c.io.a.poke(2.U)
-//      c.io.b.poke(1.U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0100_0010".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sbc)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(128.U)
-//      c.io.result.expect(128.U)
-//      c.io.flagsOut.expect("b1000_0011".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sbc)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0100_0010".U)
-//    }
-//  }
-//
-//  it should "set the half-carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sbc)
-//      c.io.a.poke(16.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(15.U)
-//      c.io.flagsOut.expect("b0001_0010".U)
-//    }
-//  }
-//
-//  it should "set the overflow flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sbc)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(255.U)
-//      c.io.flagsOut.expect("b1001_0111".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sbc)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(192.U)
-//      c.io.result.expect(64.U)
-//      c.io.flagsOut.expect("b0000_0011".U)
-//    }
-//  }
-//
-//  behavior of "AND"
-//
-//  it should "logical AND the inputs" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.and)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(1.U)
-//      c.io.flagsIn.poke("b0000_0011".U)
-//      c.io.result.expect(1.U)
-//      c.io.flagsOut.expect("b0001_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.and)
-//      c.io.a.poke(128.U)
-//      c.io.b.poke(128.U)
-//      c.io.result.expect(128.U)
-//      c.io.flagsOut.expect("b1001_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.and)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(0.U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0101_0100".U)
-//    }
-//  }
-//
-//  behavior of "OR"
-//
-//  it should "logical OR the inputs" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.or)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(0.U)
-//      c.io.flagsIn.poke("b0000_0011".U)
-//      c.io.result.expect(1.U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.or)
-//      c.io.a.poke(128.U)
-//      c.io.b.poke(0.U)
-//      c.io.result.expect(128.U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.or)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(0.U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  behavior of "XOR"
-//
-//  it should "logical XOR the inputs" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.xor)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(0.U)
-//      c.io.flagsIn.poke("b0000_0011".U)
-//      c.io.result.expect(1.U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.xor)
-//      c.io.a.poke(128.U)
-//      c.io.b.poke(0.U)
-//      c.io.result.expect(128.U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.xor)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  behavior of "CP"
-//
-//  it should "compare the inputs" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.cp)
-//      c.io.a.poke(2.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(1.U)
-//      c.io.flagsOut.expect("b0000_0010".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.cp)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(128.U)
-//      c.io.result.expect(128.U)
-//      c.io.flagsOut.expect("b1000_0011".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.cp)
-//      c.io.a.poke(1.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(0.U)
-//      c.io.flagsOut.expect("b0100_0010".U)
-//    }
-//  }
-//
-//  it should "set the half-carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.cp)
-//      c.io.a.poke(16.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(15.U)
-//      c.io.flagsOut.expect("b0001_0010".U)
-//    }
-//  }
-//
-//  it should "set the overflow flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.cp)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect(255.U)
-//      c.io.flagsOut.expect("b1001_0111".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.cp)
-//      c.io.a.poke(0.U)
-//      c.io.b.poke(192.U)
-//      c.io.result.expect(64.U)
-//      c.io.flagsOut.expect("b0000_0011".U)
-//    }
-//  }
-//
-//  behavior of "BIT"
-//
-//  it should "test the specified bit" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.bit)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.b.poke(0.U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0001_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.bit)
-//      c.io.a.poke("b1000_0000".U)
-//      c.io.b.poke(7.U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1001_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.bit)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.b.poke(1.U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0101_0100".U)
-//    }
-//  }
-//
-//  it should "leave the carry flag unchanged" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.bit)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.flagsOut.expect("b0101_0101".U)
-//    }
-//  }
-//
-//  behavior of "SET"
-//
-//  it should "set the specified bit" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.set)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.b.poke(0.U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "not set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.set)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.b.poke(7.U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "not set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.set)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  behavior of "RL"
-//
-//  it should "rotate A left though carry" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rl)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.flagsIn.poke("b0001_0011".U)
-//      c.io.result.expect("b0000_0011".U)
-//      c.io.flagsOut.expect("b0000_0100".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rl)
-//      c.io.a.poke("b0100_0000".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rl)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rl)
-//      c.io.a.poke("b1000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0101".U)
-//    }
-//  }
-//
-//  behavior of "RLC"
-//
-//  it should "rotate A left circular" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rlc)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0010".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rlc)
-//      c.io.a.poke("b0100_0000".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rlc)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rlc)
-//      c.io.a.poke("b1000_0000".U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0001".U)
-//    }
-//  }
-//
-//  behavior of "RR"
-//
-//  it should "rotate A right through carry" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rr)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0001".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rr)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rr)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rr)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0101".U)
-//    }
-//  }
-//
-//  behavior of "RRC"
-//
-//  it should "rotate A right circular" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrc)
-//      c.io.a.poke("b0000_0010".U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrc)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0001".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrc)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrc)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0001".U)
-//    }
-//  }
-//
-//  behavior of "SLA"
-//
-//  it should "shift A left arithmetic" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sla)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0010".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sla)
-//      c.io.a.poke("b0100_0000".U)
-//      c.io.result.expect("b1000_0000".U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sla)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sla)
-//      c.io.a.poke("b1000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0101".U)
-//    }
-//  }
-//
-//  behavior of "SLL"
-//
-//  it should "shift A left logical" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sll)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sll)
-//      c.io.a.poke("b0100_0000".U)
-//      c.io.result.expect("b1000_0001".U)
-//      c.io.flagsOut.expect("b1000_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sll)
-//      c.io.a.poke("b1000_0000".U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0001".U)
-//    }
-//  }
-//
-//  behavior of "SRA"
-//
-//  it should "shift A right arithmetic" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sra)
-//      c.io.a.poke("b0000_0010".U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sra)
-//      c.io.a.poke("b1000_0000".U)
-//      c.io.result.expect("b1100_0000".U)
-//      c.io.flagsOut.expect("b1000_0100".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sra)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.sra)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0101".U)
-//    }
-//  }
-//
-//  behavior of "SRL"
-//
-//  it should "shift A right logical" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.srl)
-//      c.io.a.poke("b0000_0010".U)
-//      c.io.flagsIn.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.srl)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  it should "set the carry flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.srl)
-//      c.io.a.poke("b0000_0001".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0101".U)
-//    }
-//  }
-//
-//  behavior of "RLD"
-//
-//  it should "rotate the upper BCD digit between A and B" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rld)
-//      c.io.a.poke("b0011_0000".U)
-//      c.io.b.poke("b0001_0000".U)
-//      c.io.result.expect("b0011_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rld)
-//      c.io.a.poke("b1001_0000".U)
-//      c.io.b.poke("b0001_0000".U)
-//      c.io.result.expect("b1001_0001".U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rld)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.b.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
-//
-//  behavior of "RRD"
-//
-//  it should "rotate the lower BCD digit between A and B" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrd)
-//      c.io.a.poke("b0011_0000".U)
-//      c.io.b.poke("b0000_0001".U)
-//      c.io.result.expect("b0011_0001".U)
-//      c.io.flagsOut.expect("b0000_0000".U)
-//    }
-//  }
-//
-//  it should "set the sign flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrd)
-//      c.io.a.poke("b1001_0000".U)
-//      c.io.b.poke("b0000_0001".U)
-//      c.io.result.expect("b1001_0001".U)
-//      c.io.flagsOut.expect("b1000_0000".U)
-//    }
-//  }
-//
-//  it should "set the zero flag" in {
-//    test(new ALU) { c =>
-//      c.io.op.poke(Ops.rrd)
-//      c.io.a.poke("b0000_0000".U)
-//      c.io.b.poke("b0000_0000".U)
-//      c.io.result.expect("b0000_0000".U)
-//      c.io.flagsOut.expect("b0100_0100".U)
-//    }
-//  }
+  describe("SUB") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
+      Value(2.U, 1.U, "b0000_0001".U, 1.U, "b0000_0010".U),
+      Value(0.U, 128.U, "b0000_0000".U, 128.U, "b1000_0011".U),
+      Value(16.U, 1.U, "b0000_0000".U, 15.U, "b0001_0010".U),
+      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
+    )
+
+    for (value <- values) {
+      it(s"should subtract ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.sub, value, _) }
+      }
+    }
+  }
+
+  describe("SBC") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
+      Value(2.U, 1.U, "b0000_0001".U, 0.U, "b0100_0010".U),
+      Value(0.U, 128.U, "b0000_0000".U, 128.U, "b1000_0011".U),
+      Value(16.U, 1.U, "b0000_0000".U, 15.U, "b0001_0010".U),
+      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
+    )
+
+    for (value <- values) {
+      it(s"should subtract ${value.a.litValue()} and ${value.b.litValue()} (with carry)") {
+        test(new ALU) { testALU(Ops.sbc, value, _) }
+      }
+    }
+  }
+
+  describe("AND") {
+    val values = Seq(
+      Value(1.U, 1.U, "b0000_0000".U, 1.U, "b0001_0000".U),
+      Value(128.U, 128.U, "b0000_0000".U, 128.U, "b1001_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should AND ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.and, value, _) }
+      }
+    }
+  }
+
+  describe("OR") {
+    val values = Seq(
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(128.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should OR ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.or, value, _) }
+      }
+    }
+  }
+
+  describe("XOR") {
+    val values = Seq(
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(128.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
+      Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should XOR ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.xor, value, _) }
+      }
+    }
+  }
+
+  describe("CP") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
+      Value(2.U, 1.U, "b0000_0001".U, 1.U, "b0000_0010".U),
+      Value(0.U, 128.U, "b0000_0000".U, 128.U, "b1000_0011".U),
+      Value(16.U, 1.U, "b0000_0000".U, 15.U, "b0001_0010".U),
+      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
+    )
+
+    for (value <- values) {
+      it(s"should compare ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.cp, value, _) }
+      }
+    }
+  }
+
+  describe("BIT") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0101_0101".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0001_0000".U),
+      Value(128.U, 7.U, "b0000_0000".U, 128.U, "b1001_0000".U),
+      Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should test bit ${value.b.litValue()} in ${value.a.litValue()}") {
+        test(new ALU) { testALU(Ops.bit, value, _) }
+      }
+    }
+  }
+
+  describe("SET") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0000".U),
+      Value(0.U, 7.U, "b0000_0000".U, 128.U, "b0000_0000".U),
+    )
+
+    for (value <- values) {
+      it(s"should set bit ${value.b.litValue()} of ${value.a.litValue()}") {
+        test(new ALU) { testALU(Ops.set, value, _) }
+      }
+    }
+  }
+
+  describe("RL") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0001".U, 3.U, "b0000_0100".U),
+      Value(64.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
+      Value(128.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+    )
+
+    for (value <- values) {
+      it(s"should rotate ${value.a.litValue()} to the left") {
+        test(new ALU) { testALU(Ops.rl, value, _) }
+      }
+    }
+  }
+
+  describe("RLC") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0001".U, 2.U, "b0000_0000".U),
+      Value(64.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
+      Value(128.U, 0.U, "b0000_0000".U, 1.U, "b0000_0001".U),
+    )
+
+    for (value <- values) {
+      it(s"should rotate ${value.a.litValue()} to the left (circular)") {
+        test(new ALU) { testALU(Ops.rlc, value, _) }
+      }
+    }
+  }
+
+  describe("RR") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0001".U, 128.U, "b1000_0001".U),
+      Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
+    )
+
+    for (value <- values) {
+      it(s"should rotate ${value.a.litValue()} to the right") {
+        test(new ALU) { testALU(Ops.rr, value, _) }
+      }
+    }
+  }
+
+  describe("RRC") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(2.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 128.U, "b1000_0001".U),
+    )
+
+    for (value <- values) {
+      it(s"should rotate ${value.a.litValue()} to the right (circular)") {
+        test(new ALU) { testALU(Ops.rrc, value, _) }
+      }
+    }
+  }
+
+  describe("SLA") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0000".U, 2.U, "b0000_0000".U),
+      Value(64.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
+      Value(128.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+    )
+
+    for (value <- values) {
+      it(s"should shift ${value.a.litValue()} to the left (arithmetic)") {
+        test(new ALU) { testALU(Ops.sla, value, _) }
+      }
+    }
+  }
+
+  describe("SLL") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 3.U, "b0000_0100".U),
+      Value(64.U, 0.U, "b0000_0000".U, 129.U, "b1000_0100".U),
+      Value(128.U, 0.U, "b0000_0000".U, 1.U, "b0000_0001".U),
+    )
+
+    for (value <- values) {
+      it(s"should shift ${value.a.litValue()} to the left (logical)") {
+        test(new ALU) { testALU(Ops.sll, value, _) }
+      }
+    }
+  }
+
+  describe("SRA") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+      Value(128.U, 0.U, "b0000_0000".U, 192.U, "b1000_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should shift ${value.a.litValue()} to the right (arithmetic)") {
+        test(new ALU) { testALU(Ops.sra, value, _) }
+      }
+    }
+  }
+
+  describe("SRL") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+      Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
+    )
+
+    for (value <- values) {
+      it(s"should shift ${value.a.litValue()} to the right (logical)") {
+        test(new ALU) { testALU(Ops.srl, value, _) }
+      }
+    }
+  }
+
+  describe("RLD") {
+    val values = Seq(
+      Value(48.U, 16.U, "b0000_0000".U, 49.U, "b0000_0000".U),
+      Value(144.U, 16.U, "b0000_0000".U, 145.U, "b1000_0000".U),
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should rotate upper BCD digit between ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.rld, value, _) }
+      }
+    }
+  }
+
+  describe("RRD") {
+    val values = Seq(
+      Value(48.U, 1.U, "b0000_0000".U, 49.U, "b0000_0000".U),
+      Value(144.U, 1.U, "b0000_0000".U, 145.U, "b1000_0000".U),
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+    )
+
+    for (value <- values) {
+      it(s"should rotate lower BCD digit between ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.rrd, value, _) }
+      }
+    }
+  }
 }
