@@ -56,11 +56,10 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("ADD") {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0000".U),
-      Value(2.U, 1.U, "b0000_0001".U, 3.U, "b0000_0000".U),
-      Value(15.U, 1.U, "b0000_0000".U, 16.U, "b0001_0000".U),
+      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(64.U, 64.U, "b0000_0000".U, 128.U, "b1000_0100".U),
-      Value(128.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
       Value(255.U, 1.U, "b0000_0000".U, 0.U, "b0101_0001".U),
     )
 
@@ -73,11 +72,10 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("ADC") {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0000".U),
-      Value(2.U, 1.U, "b0000_0001".U, 4.U, "b0000_0000".U),
-      Value(15.U, 1.U, "b0000_0000".U, 16.U, "b0001_0000".U),
+      Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(64.U, 64.U, "b0000_0000".U, 128.U, "b1000_0100".U),
-      Value(128.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
       Value(255.U, 1.U, "b0000_0000".U, 0.U, "b0101_0001".U),
     )
 
@@ -90,11 +88,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("SUB") {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
-      Value(2.U, 1.U, "b0000_0001".U, 1.U, "b0000_0010".U),
-      Value(0.U, 128.U, "b0000_0000".U, 128.U, "b1000_0011".U),
-      Value(16.U, 1.U, "b0000_0000".U, 15.U, "b0001_0010".U),
+      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0010".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
       Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
+      Value(128.U, 128.U, "b0000_0000".U, 0.U, "b0100_0110".U),
+      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
     )
 
     for (value <- values) {
@@ -106,11 +104,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("SBC") {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
-      Value(2.U, 1.U, "b0000_0001".U, 0.U, "b0100_0010".U),
-      Value(0.U, 128.U, "b0000_0000".U, 128.U, "b1000_0011".U),
-      Value(16.U, 1.U, "b0000_0000".U, 15.U, "b0001_0010".U),
+      Value(0.U, 0.U, "b0000_0001".U, 255.U, "b1001_0111".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
       Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
+      Value(128.U, 128.U, "b0000_0000".U, 0.U, "b0100_0110".U),
+      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
     )
 
     for (value <- values) {
@@ -120,11 +118,30 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  describe("CP") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0010".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
+      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
+      Value(128.U, 128.U, "b0000_0000".U, 0.U, "b0100_0110".U),
+      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
+    )
+
+    for (value <- values) {
+      it(s"should compare ${value.a.litValue()} and ${value.b.litValue()}") {
+        test(new ALU) { testALU(Ops.cp, value, _) }
+      }
+    }
+  }
+
   describe("AND") {
     val values = Seq(
-      Value(1.U, 1.U, "b0000_0000".U, 1.U, "b0001_0000".U),
-      Value(128.U, 128.U, "b0000_0000".U, 128.U, "b1001_0000".U),
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+      Value(1.U, 1.U, "b0000_0000".U, 1.U, "b0001_0000".U),
+      Value(255.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+      Value(0.U, 255.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+      Value(255.U, 255.U, "b0000_0000".U, 255.U, "b1001_0100".U),
     )
 
     for (value <- values) {
@@ -136,9 +153,13 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("OR") {
     val values = Seq(
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(1.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(255.U, 0.U, "b0000_0000".U, 255.U, "b1000_0100".U),
+      Value(0.U, 255.U, "b0000_0000".U, 255.U, "b1000_0100".U),
+      Value(255.U, 255.U, "b0000_0000".U, 255.U, "b1000_0100".U),
     )
 
     for (value <- values) {
@@ -150,10 +171,13 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("XOR") {
     val values = Seq(
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
-      Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(255.U, 0.U, "b0000_0000".U, 255.U, "b1000_0100".U),
+      Value(0.U, 255.U, "b0000_0000".U, 255.U, "b1000_0100".U),
+      Value(255.U, 255.U, "b0000_0000".U, 0.U, "b0100_0100".U),
     )
 
     for (value <- values) {
@@ -163,28 +187,13 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     }
   }
 
-  describe("CP") {
-    val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
-      Value(2.U, 1.U, "b0000_0001".U, 1.U, "b0000_0010".U),
-      Value(0.U, 128.U, "b0000_0000".U, 128.U, "b1000_0011".U),
-      Value(16.U, 1.U, "b0000_0000".U, 15.U, "b0001_0010".U),
-      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
-    )
-
-    for (value <- values) {
-      it(s"should compare ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.cp, value, _) }
-      }
-    }
-  }
-
   describe("BIT") {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0101_0101".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0001_0000".U),
-      Value(128.U, 7.U, "b0000_0000".U, 128.U, "b1001_0000".U),
+      Value(0.U, 1.U, "b0000_0001".U, 0.U, "b0101_0101".U),
       Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+      Value(128.U, 7.U, "b0000_0000".U, 128.U, "b1001_0000".U),
     )
 
     for (value <- values) {
@@ -197,7 +206,10 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
   describe("SET") {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0000".U),
-      Value(0.U, 7.U, "b0000_0000".U, 128.U, "b0000_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(0.U, 1.U, "b0000_0000".U, 2.U, "b0000_0000".U),
+      Value(1.U, 1.U, "b0000_0000".U, 3.U, "b0000_0000".U),
+      Value(128.U, 7.U, "b0000_0000".U, 128.U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -241,6 +253,7 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0001".U, 128.U, "b1000_0001".U),
+      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
       Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
     )
 
@@ -254,8 +267,9 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
   describe("RRC") {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(2.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 128.U, "b1000_0001".U),
+      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
+      Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -299,6 +313,7 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
       Value(128.U, 0.U, "b0000_0000".U, 192.U, "b1000_0100".U),
     )
 
@@ -313,6 +328,7 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
       Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
     )
 
@@ -325,9 +341,9 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("RLD") {
     val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(48.U, 16.U, "b0000_0000".U, 49.U, "b0000_0000".U),
       Value(144.U, 16.U, "b0000_0000".U, 145.U, "b1000_0000".U),
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
     )
 
     for (value <- values) {
@@ -339,9 +355,9 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("RRD") {
     val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(48.U, 1.U, "b0000_0000".U, 49.U, "b0000_0000".U),
       Value(144.U, 1.U, "b0000_0000".U, 145.U, "b1000_0000".U),
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
     )
 
     for (value <- values) {
