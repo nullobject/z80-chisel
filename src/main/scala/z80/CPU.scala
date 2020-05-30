@@ -109,11 +109,6 @@ class CPU extends Module {
      * M1 cycle
      */
     val m1 = Output(Bool())
-
-    /**
-     * program counter
-     */
-    val pc = Output(UInt(ADDR_WIDTH))
   })
 
   // 16-bit register file
@@ -152,11 +147,23 @@ class CPU extends Module {
   a := registers8(decoder.io.indexA)
   b := registers8(decoder.io.indexB)
 
+  // default outputs
+  io.mreq := false.B
+  io.rd := false.B
+  io.wr := false.B
+  io.halt := false.B
+  io.addr := 0.U
+  io.dout := 0.U
+  io.m1 := false.B
+
   val t1 :: t2 :: t3 :: t4 :: Nil = Enum(4)
   val stateReg = RegInit(t1)
 
   switch (stateReg) {
     is(t1) {
+      // place the program counter on the address bus
+      io.addr := pc
+
       stateReg := t2
     }
     is(t2) {
@@ -172,14 +179,4 @@ class CPU extends Module {
       stateReg := t1
     }
   }
-
-  // default outputs
-  io.mreq := false.B
-  io.rd := false.B
-  io.wr := false.B
-  io.halt := false.B
-  io.addr := 0.U
-  io.dout := 0.U
-  io.m1 := false.B
-  io.pc := pc
 }
