@@ -44,7 +44,7 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val (add :: adc :: sub :: sbc :: cp :: and :: or :: xor :: bit :: set :: rst :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil ) = Enum(21)
+  val (add :: adc :: sub :: sbc :: cp :: and :: or :: xor :: bit :: set :: res :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil ) = Enum(21)
 }
 
 /**
@@ -78,7 +78,7 @@ class ALU extends Module {
   /**
    * Calculates the bitmask for a given number.
    */
-  def bitmask(n: UInt) = (1.U << n).asUInt()
+  private def bitmask(n: UInt) = (1.U << n).asUInt()
 
   val result = WireDefault(0.U(8.W))
 
@@ -98,7 +98,7 @@ class ALU extends Module {
 
   // default flags
   flagsOut.sign := false.B
-  flagsOut.zero := result === 0.U
+  flagsOut.zero := false.B
   flagsOut.unused2 := false.B
   flagsOut.halfCarry := false.B
   flagsOut.unused1 := false.B
@@ -109,6 +109,7 @@ class ALU extends Module {
   switch (io.op) {
     is (Ops.add) {
       result := adder.io.result
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
@@ -116,6 +117,7 @@ class ALU extends Module {
     }
     is (Ops.adc) {
       result := adder.io.result
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
@@ -123,6 +125,7 @@ class ALU extends Module {
     }
     is (Ops.sub) {
       result := adder.io.result
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
@@ -130,6 +133,7 @@ class ALU extends Module {
     }
     is (Ops.sbc) {
       result := adder.io.result
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
@@ -137,6 +141,7 @@ class ALU extends Module {
     }
     is (Ops.cp) {
       result := adder.io.result
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
       flagsOut.overflow := overflow
@@ -144,22 +149,26 @@ class ALU extends Module {
     }
     is (Ops.and) {
       result := io.a & io.b
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := true.B
       flagsOut.overflow := parity
     }
     is (Ops.xor) {
       result := io.a ^ io.b
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
     is (Ops.or) {
       result := io.a | io.b
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
     is (Ops.bit) {
       result := io.a & bitmask(io.b(2, 0))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := true.B
       flagsOut.overflow := parity
@@ -168,61 +177,74 @@ class ALU extends Module {
     is (Ops.set) {
       result := io.a | bitmask(io.b(2, 0))
     }
+    is (Ops.res) {
+      result := io.a & (~bitmask(io.b(2, 0))).asUInt()
+    }
     is (Ops.rl) {
       result := Cat(io.a(6, 0), flagsIn.carry)
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.rlc) {
       result := Cat(io.a(6, 0), io.a(7))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.rr) {
       result := Cat(flagsIn.carry, io.a(7, 1))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.rrc) {
       result := Cat(io.a(0), io.a(7, 1))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.sla) {
       result := Cat(io.a(6, 0), 0.U)
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.sll) {
       result := Cat(io.a(6, 0), 1.U)
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(7)
     }
     is (Ops.sra) {
       result := Cat(io.a(7), io.a(7, 1))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.srl) {
       result := Cat(0.U, io.a(7, 1))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
       flagsOut.carry := io.a(0)
     }
     is (Ops.rld) {
       result := Cat(io.a(7, 4), io.b(7, 4))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }
     is (Ops.rrd) {
       result := Cat(io.a(7, 4), io.b(3, 0))
+      flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.overflow := parity
     }

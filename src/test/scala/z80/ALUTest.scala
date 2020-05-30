@@ -189,10 +189,9 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("BIT") {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0101_0101".U),
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0001_0000".U),
-      Value(0.U, 1.U, "b0000_0001".U, 0.U, "b0101_0101".U),
-      Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0101_0100".U),
+      Value(0.U, 1.U, "b0000_0000".U, 0.U, "b0101_0100".U),
       Value(128.U, 7.U, "b0000_0000".U, 128.U, "b1001_0000".U),
     )
 
@@ -205,16 +204,30 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
 
   describe("SET") {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0000".U),
+      Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(0.U, 1.U, "b0000_0000".U, 2.U, "b0000_0000".U),
-      Value(1.U, 1.U, "b0000_0000".U, 3.U, "b0000_0000".U),
       Value(128.U, 7.U, "b0000_0000".U, 128.U, "b0000_0000".U),
     )
 
     for (value <- values) {
       it(s"should set bit ${value.b.litValue()} of ${value.a.litValue()}") {
         test(new ALU) { testALU(Ops.set, value, _) }
+      }
+    }
+  }
+
+  describe("RES") {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0000_0000".U),
+      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0000_0000".U),
+      Value(0.U, 1.U, "b0000_0000".U, 0.U, "b0000_0000".U),
+      Value(255.U, 7.U, "b0000_0000".U, 127.U, "b0000_0000".U),
+    )
+
+    for (value <- values) {
+      it(s"should reset bit ${value.b.litValue()} of ${value.a.litValue()}") {
+        test(new ALU) { testALU(Ops.res, value, _) }
       }
     }
   }
