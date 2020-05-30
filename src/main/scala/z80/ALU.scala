@@ -62,8 +62,7 @@ class Flags extends Bundle {
 }
 
 /**
- * The 8-bit arithmetic and logical instructions of the CPU are executed in the Arithmetic
- * Logic Unit (ALU).
+ * The 8-bit arithmetic and logical instructions of the CPU are executed in the Arithmetic Logic Unit (ALU).
  */
 class ALU extends Module {
   val io = IO(new Bundle {

@@ -38,69 +38,18 @@
 package z80
 
 import chisel3._
+import chiseltest._
+import org.scalatest._
 
-case class Microcode(op: UInt, a: Option[UInt], b: Option[UInt])
+class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
+  behavior of "CPU"
 
-object Decoder {
-  /**
-   * Instruction set
-   */
-  val instructions = Seq(
-    // NOP
-    (0x00.U, Microcode(Ops.add, None, None)),
-    // INC A
-    (0x3c.U, Microcode(Ops.add, Some(Reg8.A), Some(Reg8.A))),
-    // INC B
-    (0x04.U, Microcode(Ops.add, Some(Reg8.B), Some(Reg8.B))),
-    // INC C
-    (0x0c.U, Microcode(Ops.add, Some(Reg8.C), Some(Reg8.C))),
-    // INC D
-    (0x14.U, Microcode(Ops.add, Some(Reg8.D), Some(Reg8.D))),
-  )
-}
-
-/**
- * Decodes the instruction register value into an operation and address bus indexes.
- */
-class Decoder extends Module {
-  val io = IO(new Bundle {
-    val ir = Input(UInt(8.W))
-    val op = Output(UInt(5.W))
-    val indexA = Output(UInt(4.W))
-    val indexB = Output(UInt(4.W))
-  })
-
-  /**
-   * Decodes the given microcode and sets the module outputs.
-   */
-  private def decodeMicrocode(microcode: Microcode) = {
-    io.op := microcode.op
-    microcode.a match {
-      case Some(i) => {
-        io.indexA := i
-      }
-      case None => {}
-    }
-    microcode.b match {
-      case Some(i) => {
-        io.indexB := i
-      }
-      case None => {}
-    }
-  }
-
-  // default outputs
-  io.op := 0.U
-  io.indexA := 0.U
-  io.indexB := 0.U
-
-  // decode the instructions
-  for (instruction <- Decoder.instructions) {
-    val code = instruction._1
-    val microcode = instruction._2
-
-    when (io.ir === code) {
-      decodeMicrocode(microcode)
+  it should "run a simple program" in {
+    test(new CPU) { c =>
+      c.io.pc.expect(0x00.U)
+      c.io.din.poke(0x00.U) // NOP
+      c.clock.step()
+      c.io.pc.expect(0x01.U)
     }
   }
 }
