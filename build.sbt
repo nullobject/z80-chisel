@@ -39,9 +39,8 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("releases")
 )
 
-libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.2-SNAPSHOT"
-/* libraryDependencies += "edu.berkeley.cs" %% "chisel-testers2" % "0.1-SNAPSHOT" */
-libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.2.1"
+libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.3-SNAPSHOT"
+libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.2-SNAPSHOT"
 
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
