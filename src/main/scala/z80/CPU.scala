@@ -38,6 +38,7 @@
 package z80
 
 import chisel3._
+import chisel3.util._
 
 /**
  * 16-bit registers
@@ -151,8 +152,26 @@ class CPU extends Module {
   a := registers8(decoder.io.indexA)
   b := registers8(decoder.io.indexB)
 
-  // increment program counter
-  pc := pc + 1.U
+  val t1 :: t2 :: t3 :: t4 :: Nil = Enum(4)
+  val stateReg = RegInit(t1)
+
+  switch (stateReg) {
+    is(t1) {
+      stateReg := t2
+    }
+    is(t2) {
+      stateReg := t3
+    }
+    is(t3) {
+      stateReg := t4
+    }
+    is(t4) {
+      // increment program counter
+      pc := pc + 1.U
+
+      stateReg := t1
+    }
+  }
 
   // default outputs
   io.mreq := false.B

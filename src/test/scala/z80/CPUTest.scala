@@ -48,7 +48,7 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new CPU) { c =>
       c.io.pc.expect(0x00.U)
       c.io.din.poke(0x00.U) // NOP
-      c.clock.step()
+      c.clock.step(4)
       c.io.pc.expect(0x01.U)
     }
   }
