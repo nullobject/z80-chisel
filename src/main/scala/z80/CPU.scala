@@ -147,11 +147,13 @@ class CPU extends Module {
   a := registers8(decoder.io.indexA)
   b := registers8(decoder.io.indexB)
 
+  val halt = RegInit(false.B)
+
   // default outputs
   io.mreq := false.B
   io.rd := false.B
   io.wr := false.B
-  io.halt := false.B
+  io.halt := halt
   io.addr := 0.U
   io.dout := 0.U
   io.m1 := false.B
@@ -160,21 +162,23 @@ class CPU extends Module {
   val stateReg = RegInit(t1)
 
   switch (stateReg) {
-    is(t1) {
+    is (t1) {
       // place the program counter on the address bus
       io.addr := pc
 
       stateReg := t2
     }
-    is(t2) {
+    is (t2) {
       stateReg := t3
     }
-    is(t3) {
+    is (t3) {
       stateReg := t4
     }
-    is(t4) {
-      // increment program counter
-      pc := pc + 1.U
+    is (t4) {
+      when (!halt) {
+        // increment program counter
+        pc := pc + 1.U
+      }
 
       stateReg := t1
     }
