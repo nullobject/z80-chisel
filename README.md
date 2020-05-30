@@ -1,6 +1,8 @@
 # Z80 Chisel
 
-A Z80 CPU implemented in [Chisel](https://chisel-lang.org/).
+[![Build Status](https://travis-ci.com/nullobject/z80-chisel.svg?branch=master)](https://travis-ci.com/nullobject/z80-chisel)
+
+A Z80 CPU implemented in [Chisel](https://www.chisel-lang.org/).
 
 ## Licence
 
