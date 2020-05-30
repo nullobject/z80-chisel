@@ -55,6 +55,9 @@ object Reg16 {
 case class Microcode(op: UInt, a: Option[UInt], b: Option[UInt])
 
 object Decoder {
+  /**
+   * Instruction set
+   */
   val instructions = Seq(
     // NOP
     (0x00.U, Microcode(Ops.add, None, None)),
@@ -69,34 +72,42 @@ object Decoder {
   )
 }
 
+/**
+ * Decodes the instruction register value into an operation and address bus indexes.
+ */
 class Decoder extends Module {
   val io = IO(new Bundle {
     val ir = Input(UInt(8.W))
     val op = Output(UInt(5.W))
-    val a = Output(UInt(4.W))
-    val b = Output(UInt(4.W))
+    val indexA = Output(UInt(4.W))
+    val indexB = Output(UInt(4.W))
   })
 
-  def decodeMicrocode(microcode: Microcode) = {
+  /**
+   * Decodes the given microcode and sets the module outputs.
+   */
+  private def decodeMicrocode(microcode: Microcode) = {
     io.op := microcode.op
     microcode.a match {
       case Some(i) => {
-        io.a := i
+        io.indexA := i
       }
       case None => {}
     }
     microcode.b match {
       case Some(i) => {
-        io.b := i
+        io.indexB := i
       }
       case None => {}
     }
   }
 
+  // default outputs
   io.op := 0.U
-  io.a := 0.U
-  io.b := 0.U
+  io.indexA := 0.U
+  io.indexB := 0.U
 
+  // decode the instructions
   for (instruction <- Decoder.instructions) {
     val code = instruction._1
     val microcode = instruction._2
