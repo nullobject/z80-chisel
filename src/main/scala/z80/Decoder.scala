@@ -41,21 +41,28 @@ import chisel3._
 
 case class Microcode(op: UInt, a: Option[UInt], b: Option[UInt])
 
+/**
+ * Instruction set
+ */
+object Instructions {
+  def NOP    = 0x00.U
+  def INC_B  = 0x04.U
+  def INC_C  = 0x0c.U
+  def INC_D  = 0x14.U
+  def INC_E  = 0x1c.U
+  def INC_H  = 0x24.U
+  def INC_L  = 0x2c.U
+  def INC_HL = 0x34.U
+  def INC_A  = 0x3c.U
+}
+
 object Decoder {
-  /**
-   * Instruction set
-   */
+  import Instructions._
+
   val instructions = Seq(
-    // NOP
-    (0x00.U, Microcode(Ops.add, None, None)),
-    // INC A
-    (0x3c.U, Microcode(Ops.add, Some(Reg8.A), Some(Reg8.A))),
-    // INC B
-    (0x04.U, Microcode(Ops.add, Some(Reg8.B), Some(Reg8.B))),
-    // INC C
-    (0x0c.U, Microcode(Ops.add, Some(Reg8.C), Some(Reg8.C))),
-    // INC D
-    (0x14.U, Microcode(Ops.add, Some(Reg8.D), Some(Reg8.D))),
+    (NOP   -> Microcode(Ops.add, None, None)),
+    (INC_A -> Microcode(Ops.add, Some(Reg8.A), Some(Reg8.A))),
+    (INC_B -> Microcode(Ops.add, Some(Reg8.B), Some(Reg8.B))),
   )
 }
 
