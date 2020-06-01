@@ -44,6 +44,18 @@ import org.scalatest._
 class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "CPU"
 
+  it should "assert M1 during T1 and T2" in {
+    test(new CPU) { c =>
+      c.io.m1.expect(true.B) // T1
+      c.clock.step()
+      c.io.m1.expect(true.B) // T2
+      c.clock.step()
+      c.io.m1.expect(false.B) // T3
+      c.clock.step()
+      c.io.m1.expect(false.B) // T4
+    }
+  }
+
   it should "fetch an instruction during T2" in {
     test(new CPU) { c =>
       c.io.mreq.expect(false.B)

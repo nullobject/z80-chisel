@@ -163,12 +163,18 @@ class CPU extends Module {
       // place the program counter on the address bus
       io.addr := pc
 
+      // assert M1
+      io.m1 := true.B
+
       stateReg := t2
     }
     is (t2) {
       // fetch instruction
       io.mreq := true.B
       io.rd := true.B
+
+      // assert M1
+      io.m1 := true.B
 
       stateReg := t3
     }
