@@ -185,6 +185,20 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  "DEC" should "decrement the operand" in {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 255.U, "b1001_0010".U),
+      Value(0.U, 0.U, "b0000_0001".U, 255.U, "b1001_0011".U),
+      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
+      Value(128.U, 0.U, "b0000_0000".U, 127.U, "b0001_0110".U),
+      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
+    )
+
+    for (value <- values) {
+      test(new ALU) { testALU(Ops.dec, value, _) }
+    }
+  }
+
   "BIT" should "test whether a bit is set" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),

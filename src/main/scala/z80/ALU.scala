@@ -45,6 +45,7 @@ import chisel3.util._
  */
 object Ops {
   val (add :: adc :: sub :: sbc :: cp :: and :: or :: xor :: inc :: bit :: set :: res :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil) = Enum(22)
+  val dec = 23.U
 }
 
 /**
@@ -90,7 +91,7 @@ class ALU extends Module {
 
   // arithmetic core for addition/subtraction
   val adder = Module(new Adder)
-  adder.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp
+  adder.io.subtract := io.op === Ops.sub || io.op === Ops.sbc || io.op === Ops.cp || io.op === Ops.dec
   adder.io.a := io.a
   adder.io.b := io.b
   adder.io.carryIn := flagsIn.carry && (io.op === Ops.adc || io.op === Ops.sbc)
@@ -171,7 +172,16 @@ class ALU extends Module {
       flagsOut.zero := result === 0.U
       flagsOut.sign := result(7)
       flagsOut.halfCarry := adder.io.halfCarryOut
-      flagsOut.overflow := overflow
+      flagsOut.overflow := io.a === 127.U
+      flagsOut.carry := flagsIn.carry
+    }
+    is (Ops.dec) {
+      adder.io.b := 1.U
+      result := adder.io.result
+      flagsOut.zero := result === 0.U
+      flagsOut.sign := result(7)
+      flagsOut.halfCarry := adder.io.halfCarryOut
+      flagsOut.overflow := io.a === 128.U
       flagsOut.carry := flagsIn.carry
     }
     is (Ops.bit) {
