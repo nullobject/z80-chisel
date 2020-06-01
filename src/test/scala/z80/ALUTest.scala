@@ -171,6 +171,20 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     }
   }
 
+  "INC" should "increment the operand" in {
+    val values = Seq(
+      Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
+      Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0001".U),
+      Value(1.U, 0.U, "b0000_0000".U, 2.U, "b0000_0000".U),
+      Value(127.U, 0.U, "b0000_0000".U, 128.U, "b1001_0100".U),
+      Value(255.U, 1.U, "b0000_0000".U, 0.U, "b0101_0000".U),
+    )
+
+    for (value <- values) {
+      test(new ALU) { testALU(Ops.inc, value, _) }
+    }
+  }
+
   "BIT" should "test whether a bit is set" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
