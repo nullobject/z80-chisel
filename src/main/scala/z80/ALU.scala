@@ -44,8 +44,29 @@ import chisel3.util._
  * Operations
  */
 object Ops {
-  val (add :: adc :: sub :: sbc :: cp :: and :: or :: xor :: inc :: bit :: set :: res :: rl :: rlc :: rr :: rrc :: sla :: sll :: sra :: srl :: rld :: rrd :: Nil) = Enum(22)
-  val dec = 23.U
+  val add = 0.U
+  val adc = 1.U
+  val sub = 2.U
+  val sbc = 3.U
+  val cp  = 4.U
+  val and = 5.U
+  val or  = 6.U
+  val xor = 7.U
+  val inc = 8.U
+  val dec = 9.U
+  val bit = 10.U
+  val set = 11.U
+  val res = 12.U
+  val rl  = 13.U
+  val rlc = 14.U
+  val rr  = 15.U
+  val rrc = 16.U
+  val sla = 17.U
+  val sll = 18.U
+  val sra = 19.U
+  val srl = 20.U
+  val rld = 21.U
+  val rrd = 22.U
 }
 
 /**
