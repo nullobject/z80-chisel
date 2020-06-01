@@ -68,8 +68,8 @@ object Reg8 {
  * Z80 CPU
  */
 class CPU extends Module {
-  val DATA_WIDTH = 8.W
-  val ADDR_WIDTH = 16.W
+  val DATA_WIDTH = 8
+  val ADDR_WIDTH = 16
 
   val io = IO(new Bundle {
     /**
@@ -95,25 +95,28 @@ class CPU extends Module {
     /**
      * address bus
      */
-    val addr = Output(UInt(ADDR_WIDTH))
+    val addr = Output(UInt(ADDR_WIDTH.W))
 
     /**
      * data input
      */
-    val din = Input(UInt(DATA_WIDTH))
+    val din = Input(UInt(DATA_WIDTH.W))
 
     /**
      * data output
      */
-    val dout = Output(UInt(DATA_WIDTH))
+    val dout = Output(UInt(DATA_WIDTH.W))
 
     /**
      * M1 cycle
      */
     val m1 = Output(Bool())
 
+    /**
+     * debug output
+     */
+    val registers8  = Output(Vec(16, UInt(8.W)))
     val registers16 = Output(Vec(8, UInt(16.W)))
-    val registers8 = Output(Vec(16, UInt(8.W)))
   })
 
   // 16-bit register file
@@ -124,11 +127,11 @@ class CPU extends Module {
   registers8 := registers16.flatMap { r => Seq(r(15, 8), r(7, 0)) }
 
   // instruction register
-  val pc = RegInit(0.U(ADDR_WIDTH))
-  val ir = RegInit(0.U(DATA_WIDTH))
+  val pc = RegInit(0.U(ADDR_WIDTH.W))
+  val ir = RegInit(0.U(DATA_WIDTH.W))
 
   // data input register
-  val dataIn = RegNext(io.din, 0.U(DATA_WIDTH))
+  val dataIn = RegNext(io.din, 0.U(DATA_WIDTH.W))
 
   // instruction decoder
   val decoder = Module(new Decoder)
@@ -186,7 +189,7 @@ class CPU extends Module {
     }
   }
 
-  // FIXME: debug
-  io.registers16 <> registers16
+  // set debug output
   io.registers8 <> registers8
+  io.registers16 <> registers16
 }
