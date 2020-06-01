@@ -48,8 +48,10 @@ object Reg16 {
   val BC = 1.U
   val DE = 2.U
   val HL = 3.U
-  val SP = 4.U
-  val PC = 5.U
+  val IX = 4.U
+  val IY = 5.U
+  val SP = 6.U
+  val WZ = 7.U // internal
 }
 
 /**
@@ -109,6 +111,9 @@ class CPU extends Module {
      * M1 cycle
      */
     val m1 = Output(Bool())
+
+    val registers16 = Output(Vec(8, UInt(16.W)))
+    val registers8 = Output(Vec(16, UInt(8.W)))
   })
 
   // 16-bit register file
@@ -118,19 +123,12 @@ class CPU extends Module {
   val registers8 = Reg(Vec(16, UInt(8.W)))
   registers8 := registers16.flatMap { r => Seq(r(15, 8), r(7, 0)) }
 
-  // register aliases
-  val pc = registers16(Reg16.PC)
-  val f = registers8(Reg8.F)
-
   // instruction register
+  val pc = RegInit(0.U(ADDR_WIDTH))
   val ir = RegInit(0.U(DATA_WIDTH))
 
   // data input register
   val dataIn = RegNext(io.din, 0.U(DATA_WIDTH))
-
-  // internal data buses
-  val a = Wire(UInt(DATA_WIDTH))
-  val b = Wire(UInt(DATA_WIDTH))
 
   // instruction decoder
   val decoder = Module(new Decoder)
@@ -139,13 +137,9 @@ class CPU extends Module {
   // arithmetic logic unit
   val alu = Module(new ALU)
   alu.io.op := decoder.io.op
-  alu.io.a := a
-  alu.io.b := b
-  alu.io.flagsIn := f
-
-  // FIXME: set internal buses with decoder output
-  a := registers8(decoder.io.indexA)
-  b := registers8(decoder.io.indexB)
+  alu.io.a := registers8(Reg8.A)
+  alu.io.b := registers8(decoder.io.indexB)
+  alu.io.flagsIn := registers8(Reg8.F)
 
   val halt = RegInit(false.B)
 
@@ -191,4 +185,8 @@ class CPU extends Module {
       stateReg := t1
     }
   }
+
+  // FIXME: debug
+  io.registers16 <> registers16
+  io.registers8 <> registers8
 }

@@ -62,8 +62,22 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       c.io.addr.expect(0x00.U)
       c.clock.step(4)
       c.io.addr.expect(0x01.U)
+    }
+  }
+
+  it should "execute a INC A instruction" in {
+    test(new CPU) { c =>
+      c.io.din.poke(Instructions.INC_A)
       c.clock.step(4)
-      c.io.addr.expect(0x02.U)
+      c.io.registers8(0).expect(0x01.U)
+    }
+  }
+
+  it should "execute a INC B instruction" in {
+    test(new CPU) { c =>
+      c.io.din.poke(Instructions.INC_B)
+      c.clock.step(4)
+      c.io.registers8(2).expect(0x01.U)
     }
   }
 }
