@@ -41,7 +41,7 @@ import chisel3._
 import chiseltest._
 import org.scalatest._
 
-class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
+class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   // ALU I/O value object
   case class Value(a: UInt, b: UInt, flagsIn: UInt, result: UInt, flagsOut: UInt)
 
@@ -54,7 +54,7 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     c.io.flagsOut.expect(value.flagsOut)
   }
 
-  describe("ADD") {
+  "ADD" should "add the operands" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
@@ -64,13 +64,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should add ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.add, value, _) }
-      }
+      test(new ALU) { testALU(Ops.add, value, _) }
     }
   }
 
-  describe("ADC") {
+  "ADC" should "add the operands with carry" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
@@ -80,13 +78,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should add ${value.a.litValue()} and ${value.b.litValue()} (with carry)") {
-        test(new ALU) { testALU(Ops.adc, value, _) }
-      }
+      test(new ALU) { testALU(Ops.adc, value, _) }
     }
   }
 
-  describe("SUB") {
+  "SUB" should "subtract the operands" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0010".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
@@ -96,13 +92,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should subtract ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.sub, value, _) }
-      }
+      test(new ALU) { testALU(Ops.sub, value, _) }
     }
   }
 
-  describe("SBC") {
+  "SBC" should "subtract the operands with carry" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 255.U, "b1001_0111".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
@@ -112,13 +106,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should subtract ${value.a.litValue()} and ${value.b.litValue()} (with carry)") {
-        test(new ALU) { testALU(Ops.sbc, value, _) }
-      }
+      test(new ALU) { testALU(Ops.sbc, value, _) }
     }
   }
 
-  describe("CP") {
+  "CP" should "compare the operands" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0010".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
@@ -128,13 +120,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should compare ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.cp, value, _) }
-      }
+      test(new ALU) { testALU(Ops.cp, value, _) }
     }
   }
 
-  describe("AND") {
+  "AND" should "logical AND the operands" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
@@ -145,13 +135,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should AND ${value.a.litValue()} and ${value.b.litValue()}") {
         test(new ALU) { testALU(Ops.and, value, _) }
-      }
     }
   }
 
-  describe("OR") {
+  "OR" should "logical OR the operands" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
@@ -163,13 +151,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should OR ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.or, value, _) }
-      }
+      test(new ALU) { testALU(Ops.or, value, _) }
     }
   }
 
-  describe("XOR") {
+  "XOR" should "logical XOR the operands" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
@@ -181,13 +167,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should XOR ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.xor, value, _) }
-      }
+      test(new ALU) { testALU(Ops.xor, value, _) }
     }
   }
 
-  describe("BIT") {
+  "BIT" should "test whether a bit is set" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0001_0000".U),
@@ -196,13 +180,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should test bit ${value.b.litValue()} in ${value.a.litValue()}") {
-        test(new ALU) { testALU(Ops.bit, value, _) }
-      }
+      test(new ALU) { testALU(Ops.bit, value, _) }
     }
   }
 
-  describe("SET") {
+  "SET" should "set a bit" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
@@ -211,13 +193,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should set bit ${value.b.litValue()} of ${value.a.litValue()}") {
-        test(new ALU) { testALU(Ops.set, value, _) }
-      }
+      test(new ALU) { testALU(Ops.set, value, _) }
     }
   }
 
-  describe("RES") {
+  "RES" should "reset a bit" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0000_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0000_0000".U),
@@ -226,13 +206,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should reset bit ${value.b.litValue()} of ${value.a.litValue()}") {
-        test(new ALU) { testALU(Ops.res, value, _) }
-      }
+      test(new ALU) { testALU(Ops.res, value, _) }
     }
   }
 
-  describe("RL") {
+  "RL" should "rotate the bits to the left" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0001".U, 3.U, "b0000_0100".U),
@@ -241,13 +219,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should rotate ${value.a.litValue()} to the left") {
-        test(new ALU) { testALU(Ops.rl, value, _) }
-      }
+      test(new ALU) { testALU(Ops.rl, value, _) }
     }
   }
 
-  describe("RLC") {
+  "RLC" should "rotate the bits to the left (circular)" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0001".U, 2.U, "b0000_0000".U),
@@ -256,13 +232,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should rotate ${value.a.litValue()} to the left (circular)") {
-        test(new ALU) { testALU(Ops.rlc, value, _) }
-      }
+      test(new ALU) { testALU(Ops.rlc, value, _) }
     }
   }
 
-  describe("RR") {
+  "RR" should "rotate the bits to the right" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0001".U, 128.U, "b1000_0001".U),
@@ -271,13 +245,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should rotate ${value.a.litValue()} to the right") {
-        test(new ALU) { testALU(Ops.rr, value, _) }
-      }
+      test(new ALU) { testALU(Ops.rr, value, _) }
     }
   }
 
-  describe("RRC") {
+  "RRC" should "rotate the bits to the right (circular)" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 128.U, "b1000_0001".U),
@@ -286,13 +258,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should rotate ${value.a.litValue()} to the right (circular)") {
-        test(new ALU) { testALU(Ops.rrc, value, _) }
-      }
+      test(new ALU) { testALU(Ops.rrc, value, _) }
     }
   }
 
-  describe("SLA") {
+  "SLA" should "shift the bits to the left (arithmetic)" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 2.U, "b0000_0000".U),
@@ -301,13 +271,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should shift ${value.a.litValue()} to the left (arithmetic)") {
-        test(new ALU) { testALU(Ops.sla, value, _) }
-      }
+      test(new ALU) { testALU(Ops.sla, value, _) }
     }
   }
 
-  describe("SLL") {
+  "SLL" should "shift the bits to the left (logical)" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
       Value(1.U, 0.U, "b0000_0000".U, 3.U, "b0000_0100".U),
@@ -316,13 +284,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should shift ${value.a.litValue()} to the left (logical)") {
-        test(new ALU) { testALU(Ops.sll, value, _) }
-      }
+      test(new ALU) { testALU(Ops.sll, value, _) }
     }
   }
 
-  describe("SRA") {
+  "SRA" should "shift the bits to the right (arithmetic)" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
@@ -331,13 +297,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should shift ${value.a.litValue()} to the right (arithmetic)") {
-        test(new ALU) { testALU(Ops.sra, value, _) }
-      }
+      test(new ALU) { testALU(Ops.sra, value, _) }
     }
   }
 
-  describe("SRL") {
+  "SRL" should "shift the bits to the right (logical)" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
@@ -346,13 +310,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should shift ${value.a.litValue()} to the right (logical)") {
-        test(new ALU) { testALU(Ops.srl, value, _) }
-      }
+      test(new ALU) { testALU(Ops.srl, value, _) }
     }
   }
 
-  describe("RLD") {
+  "RLD" should "rotate the upper BCD digit" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(48.U, 16.U, "b0000_0000".U, 49.U, "b0000_0000".U),
@@ -360,13 +322,11 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should rotate upper BCD digit between ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.rld, value, _) }
-      }
+      test(new ALU) { testALU(Ops.rld, value, _) }
     }
   }
 
-  describe("RRD") {
+  "RRD" should "rotate the lower BCD digit" in {
     val values = Seq(
       Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
       Value(48.U, 1.U, "b0000_0000".U, 49.U, "b0000_0000".U),
@@ -374,9 +334,7 @@ class ALUTest extends FunSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      it(s"should rotate lower BCD digit between ${value.a.litValue()} and ${value.b.litValue()}") {
-        test(new ALU) { testALU(Ops.rrd, value, _) }
-      }
+      test(new ALU) { testALU(Ops.rrd, value, _) }
     }
   }
 }
