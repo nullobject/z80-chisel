@@ -44,6 +44,19 @@ import org.scalatest._
 class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "CPU"
 
+  it should "fetch an instruction during T2" in {
+    test(new CPU) { c =>
+      c.io.mreq.expect(false.B)
+      c.io.rd.expect(false.B)
+      c.clock.step()
+      c.io.mreq.expect(true.B)
+      c.io.rd.expect(true.B)
+      c.clock.step(cycles = 2)
+      c.io.mreq.expect(false.B)
+      c.io.rd.expect(false.B)
+    }
+  }
+
   it should "increment the program counter every four clock cycles" in {
     test(new CPU) { c =>
       c.io.addr.expect(0x00.U)

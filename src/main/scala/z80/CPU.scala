@@ -169,16 +169,24 @@ class CPU extends Module {
       stateReg := t2
     }
     is (t2) {
+      // fetch instruction
+      io.mreq := true.B
+      io.rd := true.B
+
       stateReg := t3
     }
     is (t3) {
+      // latch instruction
+      ir := io.din
+
       stateReg := t4
     }
     is (t4) {
-      when (!halt) {
-        // increment program counter
-        pc := pc + 1.U
-      }
+      // store ALU result to the target register
+      registers8(decoder.io.indexA) := alu.io.result
+
+      // increment program counter
+      when (!halt) { pc := pc + 1.U }
 
       stateReg := t1
     }
