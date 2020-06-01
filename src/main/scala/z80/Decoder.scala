@@ -45,9 +45,9 @@ object Decoder {
   import Instructions._
 
   val instructions = Seq(
-    (NOP   -> Microcode(Ops.add, None, None)),
-    (INC_A -> Microcode(Ops.add, Some(Reg8.A), Some(Reg8.A))),
-    (INC_B -> Microcode(Ops.add, Some(Reg8.B), Some(Reg8.B))),
+    (NOP   -> Microcode(Ops.ADD, None, None)),
+    (INC_A -> Microcode(Ops.ADD, Some(Reg8.A), Some(Reg8.A))),
+    (INC_B -> Microcode(Ops.ADD, Some(Reg8.B), Some(Reg8.B))),
   )
 }
 

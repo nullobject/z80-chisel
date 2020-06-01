@@ -47,7 +47,7 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "NOP" in {
     test(new Decoder) { c =>
       c.io.ir.poke(0x00.U)
-      c.io.op.expect(Ops.add)
+      c.io.op.expect(Ops.ADD)
       c.io.indexA.expect(0.U)
       c.io.indexB.expect(0.U)
     }
@@ -56,7 +56,7 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "INC A" in {
     test(new Decoder) { c =>
       c.io.ir.poke(0x3c.U)
-      c.io.op.expect(Ops.add)
+      c.io.op.expect(Ops.ADD)
       c.io.indexA.expect(Reg8.A)
       c.io.indexB.expect(Reg8.A)
     }
@@ -65,7 +65,7 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "INC B" in {
     test(new Decoder) { c =>
       c.io.ir.poke(0x04.U)
-      c.io.op.expect(Ops.add)
+      c.io.op.expect(Ops.ADD)
       c.io.indexA.expect(Reg8.B)
       c.io.indexB.expect(Reg8.B)
     }
