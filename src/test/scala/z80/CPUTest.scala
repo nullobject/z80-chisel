@@ -79,17 +79,17 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   it should "execute a INC A instruction" in {
     test(new CPU) { c =>
-      c.io.din.poke(Instructions.INC_A)
+      c.io.din.poke(Instructions.INC_A.U)
       c.clock.step(4)
-      c.io.registers8(0).expect(0x01.U)
+      c.io.registers8(Reg8.A).expect(0x01.U)
     }
   }
 
   it should "execute a INC B instruction" in {
     test(new CPU) { c =>
-      c.io.din.poke(Instructions.INC_B)
+      c.io.din.poke(Instructions.INC_B.U)
       c.clock.step(4)
-      c.io.registers8(2).expect(0x01.U)
+      c.io.registers8(Reg8.B).expect(0x01.U)
     }
   }
 }

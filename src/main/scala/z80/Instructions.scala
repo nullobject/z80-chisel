@@ -43,14 +43,14 @@ import chisel3._
  * Instruction set
  */
 object Instructions {
-  def NOP    = 0x00.U
-  def INC_B  = 0x04.U
-  def INC_C  = 0x0c.U
-  def INC_D  = 0x14.U
-  def INC_E  = 0x1c.U
-  def INC_H  = 0x24.U
-  def INC_L  = 0x2c.U
-  def INC_HL = 0x34.U
-  def INC_A  = 0x3c.U
-  def HALT   = 0x76.U
+  def NOP    = 0x00
+  def INC_B  = 0x04
+  def INC_C  = 0x0c
+  def INC_D  = 0x14
+  def INC_E  = 0x1c
+  def INC_H  = 0x24
+  def INC_L  = 0x2c
+  def INC_HL = 0x34
+  def INC_A  = 0x3c
+  def HALT   = 0x76
 }

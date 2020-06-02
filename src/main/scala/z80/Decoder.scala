@@ -39,7 +39,7 @@ package z80
 
 import chisel3._
 
-case class Microcode(op: UInt, a: Option[UInt], b: Option[UInt])
+case class Microcode(op: Int, a: Option[Int], b: Option[Int])
 
 object Decoder {
   import Instructions._
@@ -66,17 +66,13 @@ class Decoder extends Module {
    * Decodes the given microcode and sets the module outputs.
    */
   private def decodeMicrocode(microcode: Microcode) = {
-    io.op := microcode.op
+    io.op := microcode.op.U
     microcode.a match {
-      case Some(i) => {
-        io.indexA := i
-      }
+      case Some(i) => { io.indexA := i.U }
       case None => {}
     }
     microcode.b match {
-      case Some(i) => {
-        io.indexB := i
-      }
+      case Some(i) => { io.indexB := i.U }
       case None => {}
     }
   }
@@ -91,7 +87,7 @@ class Decoder extends Module {
     val code = instruction._1
     val microcode = instruction._2
 
-    when (io.ir === code) {
+    when (io.ir === code.U) {
       decodeMicrocode(microcode)
     }
   }

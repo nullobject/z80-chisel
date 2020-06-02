@@ -64,7 +64,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.ADD, value, _) }
+      test(new ALU) { testALU(Ops.ADD.U, value, _) }
     }
   }
 
@@ -78,7 +78,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.ADC, value, _) }
+      test(new ALU) { testALU(Ops.ADC.U, value, _) }
     }
   }
 
@@ -92,7 +92,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SUB, value, _) }
+      test(new ALU) { testALU(Ops.SUB.U, value, _) }
     }
   }
 
@@ -106,7 +106,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SBC, value, _) }
+      test(new ALU) { testALU(Ops.SBC.U, value, _) }
     }
   }
 
@@ -120,7 +120,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.CP, value, _) }
+      test(new ALU) { testALU(Ops.CP.U, value, _) }
     }
   }
 
@@ -135,7 +135,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-        test(new ALU) { testALU(Ops.AND, value, _) }
+        test(new ALU) { testALU(Ops.AND.U, value, _) }
     }
   }
 
@@ -151,7 +151,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.OR, value, _) }
+      test(new ALU) { testALU(Ops.OR.U, value, _) }
     }
   }
 
@@ -167,7 +167,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.XOR, value, _) }
+      test(new ALU) { testALU(Ops.XOR.U, value, _) }
     }
   }
 
@@ -181,7 +181,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.INC, value, _) }
+      test(new ALU) { testALU(Ops.INC.U, value, _) }
     }
   }
 
@@ -195,7 +195,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.DEC, value, _) }
+      test(new ALU) { testALU(Ops.DEC.U, value, _) }
     }
   }
 
@@ -208,7 +208,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.BIT, value, _) }
+      test(new ALU) { testALU(Ops.BIT.U, value, _) }
     }
   }
 
@@ -221,7 +221,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SET, value, _) }
+      test(new ALU) { testALU(Ops.SET.U, value, _) }
     }
   }
 
@@ -234,7 +234,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RES, value, _) }
+      test(new ALU) { testALU(Ops.RES.U, value, _) }
     }
   }
 
@@ -247,7 +247,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RL, value, _) }
+      test(new ALU) { testALU(Ops.RL.U, value, _) }
     }
   }
 
@@ -260,7 +260,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RLC, value, _) }
+      test(new ALU) { testALU(Ops.RLC.U, value, _) }
     }
   }
 
@@ -273,7 +273,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RR, value, _) }
+      test(new ALU) { testALU(Ops.RR.U, value, _) }
     }
   }
 
@@ -286,7 +286,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RRC, value, _) }
+      test(new ALU) { testALU(Ops.RRC.U, value, _) }
     }
   }
 
@@ -299,7 +299,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SLA, value, _) }
+      test(new ALU) { testALU(Ops.SLA.U, value, _) }
     }
   }
 
@@ -312,7 +312,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SLL, value, _) }
+      test(new ALU) { testALU(Ops.SLL.U, value, _) }
     }
   }
 
@@ -325,7 +325,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SRA, value, _) }
+      test(new ALU) { testALU(Ops.SRA.U, value, _) }
     }
   }
 
@@ -338,7 +338,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.SRL, value, _) }
+      test(new ALU) { testALU(Ops.SRL.U, value, _) }
     }
   }
 
@@ -350,7 +350,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RLD, value, _) }
+      test(new ALU) { testALU(Ops.RLD.U, value, _) }
     }
   }
 
@@ -362,7 +362,7 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
     )
 
     for (value <- values) {
-      test(new ALU) { testALU(Ops.RRD, value, _) }
+      test(new ALU) { testALU(Ops.RRD.U, value, _) }
     }
   }
 }

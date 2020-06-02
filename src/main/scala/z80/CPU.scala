@@ -44,24 +44,24 @@ import chisel3.util._
  * 16-bit registers
  */
 object Reg16 {
-  val AF = 0.U
-  val BC = 1.U
-  val DE = 2.U
-  val HL = 3.U
-  val IX = 4.U
-  val IY = 5.U
-  val SP = 6.U
-  val WZ = 7.U // internal
+  val AF = 0
+  val BC = 1
+  val DE = 2
+  val HL = 3
+  val IX = 4
+  val IY = 5
+  val SP = 6
+  val WZ = 7 // internal
 }
 
 /**
  * 8-bit registers
  */
 object Reg8 {
-  val A = 0.U; val F = 1.U
-  val B = 2.U; val C = 3.U
-  val D = 4.U; val E = 5.U
-  val H = 6.U; val L = 7.U
+  val A = 0; val F = 1
+  val B = 2; val C = 3
+  val D = 4; val E = 5
+  val H = 6; val L = 7
 }
 
 /**
