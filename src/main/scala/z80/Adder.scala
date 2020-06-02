@@ -41,27 +41,40 @@ import chisel3._
 import chisel3.util._
 
 /**
- * Performs an addition or subtraction operation with two 8-bit values, including carry in and out bits.
+ * Performs an addition or subtraction operation with two 8-bit values,
+ * including carry and half-carry flags.
  */
 class Adder extends Module {
   val io = IO(new Bundle {
+    /** Assert the subtract flag to perform a subtract operation */
     val subtract = Input(Bool())
+    /** Operand A */
     val a = Input(UInt(8.W))
+    /** Operand B */
     val b = Input(UInt(8.W))
+    /** Carry input */
     val carryIn = Input(Bool())
+    /** The result of the addition/subtraction */
     val result = Output(UInt(8.W))
-    val halfCarryOut= Output(Bool())
-    val carryOut= Output(Bool())
+    /** Half-carry output */
+    val halfCarryOut = Output(Bool())
+    /** Carry output */
+    val carryOut = Output(Bool())
   })
 
-  val a = io.a
+  // Invert the B operand for a subtract operation
   val b = Mux(io.subtract.asBool(), ~io.b, io.b).asUInt()
-  val x = (a(3, 0) +& b(3, 0)) + (io.carryIn ^ io.subtract)
-  val halfCarry = x(4)
-  val y = (a(7, 4) +& b(7, 4)) + halfCarry
-  val carry = y(4)
 
-  io.result := Cat(y(3, 0), x(3, 0))
+  // Low nibble
+  val lowNibble = (io.a(3, 0) +& b(3, 0)) + (io.carryIn ^ io.subtract)
+  val halfCarry = lowNibble(4)
+
+  // High nibble
+  val highNibble = (io.a(7, 4) +& b(7, 4)) + halfCarry
+  val carry = highNibble(4)
+
+  // Outputs
+  io.result := highNibble(3, 0) ## lowNibble(3, 0)
   io.halfCarryOut := halfCarry ^ io.subtract
   io.carryOut := carry ^ io.subtract
 }

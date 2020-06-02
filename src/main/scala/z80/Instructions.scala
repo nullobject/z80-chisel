@@ -37,11 +37,7 @@
 
 package z80
 
-import chisel3._
-
-/**
- * Instruction set
- */
+/** Instruction set */
 object Instructions {
   def NOP    = 0x00
   def INC_B  = 0x04
@@ -52,5 +48,6 @@ object Instructions {
   def INC_L  = 0x2c
   def INC_HL = 0x34
   def INC_A  = 0x3c
+  def LD_A   = 0x3e
   def HALT   = 0x76
 }

@@ -14,7 +14,7 @@
  * https://twitter.com/nullobject
  * https://github.com/nullobject
  *
- * Copyright (c) 2020 Josh Bassett
+ * Copyright (dut) 2020 Josh Bassett
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,32 +42,48 @@ import chiseltest._
 import org.scalatest._
 
 class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
-  behavior of "Decoder"
+  behavior of "instructions"
 
   it should "NOP" in {
-    test(new Decoder) { c =>
-      c.io.ir.poke(0x00.U)
-      c.io.op.expect(Ops.ADD.U)
-      c.io.indexA.expect(0.U)
-      c.io.indexB.expect(0.U)
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.NOP.U)
+      dut.io.op.expect(Ops.NOP.U)
+      dut.io.busIndex.expect(0.U)
     }
   }
 
   it should "INC A" in {
-    test(new Decoder) { c =>
-      c.io.ir.poke(0x3c.U)
-      c.io.op.expect(Ops.INC.U)
-      c.io.indexA.expect(Reg8.A.U)
-      c.io.indexB.expect(0.U)
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.INC_A.U)
+      dut.io.op.expect(Ops.INC.U)
+      dut.io.busIndex.expect(Reg8.A.U)
     }
   }
 
   it should "INC B" in {
-    test(new Decoder) { c =>
-      c.io.ir.poke(0x04.U)
-      c.io.op.expect(Ops.INC.U)
-      c.io.indexA.expect(Reg8.B.U)
-      c.io.indexB.expect(0.U)
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.INC_B.U)
+      dut.io.op.expect(Ops.INC.U)
+      dut.io.busIndex.expect(Reg8.B.U)
+    }
+  }
+
+  it should "LD A" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.LD_A.U)
+      dut.io.mCycle.poke(0.U)
+      dut.io.op.expect(Ops.NOP.U)
+      dut.io.busIndex.expect(0.U)
+    }
+  }
+
+  it should "HALT" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.HALT.U)
+      dut.io.mCycle.poke(0.U)
+      dut.io.op.expect(Ops.NOP.U)
+      dut.io.busIndex.expect(0.U)
+      dut.io.halt.expect(true.B)
     }
   }
 }

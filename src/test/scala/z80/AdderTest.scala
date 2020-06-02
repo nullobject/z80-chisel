@@ -14,7 +14,7 @@
  * https://twitter.com/nullobject
  * https://github.com/nullobject
  *
- * Copyright (c) 2020 Josh Bassett
+ * Copyright (dut) 2020 Josh Bassett
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,90 +45,90 @@ class AdderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "An add operation"
 
   it should "add the inputs (without carry)" in {
-    test(new Adder) { c =>
-      c.io.a.poke(3.U)
-      c.io.b.poke(2.U)
-      c.io.result.expect(5.U)
-      c.io.halfCarryOut.expect(false.B)
-      c.io.carryOut.expect(false.B)
+    test(new Adder) { dut =>
+      dut.io.a.poke(3.U)
+      dut.io.b.poke(2.U)
+      dut.io.result.expect(5.U)
+      dut.io.halfCarryOut.expect(false.B)
+      dut.io.carryOut.expect(false.B)
     }
   }
 
   it should "add the inputs (with carry)" in {
-    test(new Adder) { c =>
-      c.io.a.poke(3.U)
-      c.io.b.poke(2.U)
-      c.io.carryIn.poke(true.B)
-      c.io.result.expect(6.U)
-      c.io.halfCarryOut.expect(false.B)
-      c.io.carryOut.expect(false.B)
+    test(new Adder) { dut =>
+      dut.io.a.poke(3.U)
+      dut.io.b.poke(2.U)
+      dut.io.carryIn.poke(true.B)
+      dut.io.result.expect(6.U)
+      dut.io.halfCarryOut.expect(false.B)
+      dut.io.carryOut.expect(false.B)
     }
   }
 
   it should "set the half-carry flag" in {
-    test(new Adder) { c =>
-      c.io.a.poke(15.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(16.U)
-      c.io.halfCarryOut.expect(true.B)
-      c.io.carryOut.expect(false.B)
+    test(new Adder) { dut =>
+      dut.io.a.poke(15.U)
+      dut.io.b.poke(1.U)
+      dut.io.result.expect(16.U)
+      dut.io.halfCarryOut.expect(true.B)
+      dut.io.carryOut.expect(false.B)
     }
   }
 
   it should "set the carry flag" in {
-    test(new Adder) { c =>
-      c.io.a.poke(255.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(0.U)
-      c.io.halfCarryOut.expect(true.B)
-      c.io.carryOut.expect(true.B)
+    test(new Adder) { dut =>
+      dut.io.a.poke(255.U)
+      dut.io.b.poke(1.U)
+      dut.io.result.expect(0.U)
+      dut.io.halfCarryOut.expect(true.B)
+      dut.io.carryOut.expect(true.B)
     }
   }
 
   behavior of "A subtract operation"
 
   it should "subtract the inputs (without carry)" in {
-    test(new Adder) { c =>
-      c.io.subtract.poke(true.B)
-      c.io.a.poke(3.U)
-      c.io.b.poke(2.U)
-      c.io.result.expect(1.U)
-      c.io.halfCarryOut.expect(false.B)
-      c.io.carryOut.expect(false.B)
+    test(new Adder) { dut =>
+      dut.io.subtract.poke(true.B)
+      dut.io.a.poke(3.U)
+      dut.io.b.poke(2.U)
+      dut.io.result.expect(1.U)
+      dut.io.halfCarryOut.expect(false.B)
+      dut.io.carryOut.expect(false.B)
     }
   }
 
   it should "subtract the inputs (with carry)" in {
-    test(new Adder) { c =>
-      c.io.subtract.poke(true.B)
-      c.io.a.poke(3.U)
-      c.io.b.poke(2.U)
-      c.io.carryIn.poke(true.B)
-      c.io.result.expect(0.U)
-      c.io.halfCarryOut.expect(false.B)
-      c.io.carryOut.expect(false.B)
+    test(new Adder) { dut =>
+      dut.io.subtract.poke(true.B)
+      dut.io.a.poke(3.U)
+      dut.io.b.poke(2.U)
+      dut.io.carryIn.poke(true.B)
+      dut.io.result.expect(0.U)
+      dut.io.halfCarryOut.expect(false.B)
+      dut.io.carryOut.expect(false.B)
     }
   }
 
   it should "set the half-carry flag" in {
-    test(new Adder) { c =>
-      c.io.subtract.poke(true.B)
-      c.io.a.poke(16.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(15.U)
-      c.io.halfCarryOut.expect(true.B)
-      c.io.carryOut.expect(false.B)
+    test(new Adder) { dut =>
+      dut.io.subtract.poke(true.B)
+      dut.io.a.poke(16.U)
+      dut.io.b.poke(1.U)
+      dut.io.result.expect(15.U)
+      dut.io.halfCarryOut.expect(true.B)
+      dut.io.carryOut.expect(false.B)
     }
   }
 
   it should "set the carry flag" in {
-    test(new Adder) { c =>
-      c.io.subtract.poke(true.B)
-      c.io.a.poke(0.U)
-      c.io.b.poke(1.U)
-      c.io.result.expect(255.U)
-      c.io.halfCarryOut.expect(true.B)
-      c.io.carryOut.expect(true.B)
+    test(new Adder) { dut =>
+      dut.io.subtract.poke(true.B)
+      dut.io.a.poke(0.U)
+      dut.io.b.poke(1.U)
+      dut.io.result.expect(255.U)
+      dut.io.halfCarryOut.expect(true.B)
+      dut.io.carryOut.expect(true.B)
     }
   }
 }

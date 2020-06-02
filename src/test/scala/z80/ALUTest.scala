@@ -14,7 +14,7 @@
  * https://twitter.com/nullobject
  * https://github.com/nullobject
  *
- * Copyright (c) 2020 Josh Bassett
+ * Copyright (dut) 2020 Josh Bassett
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,24 +43,35 @@ import org.scalatest._
 
 class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
   // ALU I/O value object
-  case class Value(a: UInt, b: UInt, flagsIn: UInt, result: UInt, flagsOut: UInt)
+  case class Value(a: UInt, b: UInt, result: UInt, flagsIn: UInt, flagsOut: UInt)
 
-  def testALU(op: UInt, value: Value, c: ALU) = {
-    c.io.op.poke(op)
-    c.io.a.poke(value.a)
-    c.io.b.poke(value.b)
-    c.io.flagsIn.poke(value.flagsIn)
-    c.io.result.expect(value.result)
-    c.io.flagsOut.expect(value.flagsOut)
+  def testALU(op: UInt, value: Value, alu: ALU) = {
+    alu.io.op.poke(op)
+    alu.io.a.poke(value.a)
+    alu.io.b.poke(value.b)
+    alu.io.flagsIn.poke(value.flagsIn)
+    alu.io.result.expect(value.result)
+    alu.io.flagsOut.expect(value.flagsOut)
+  }
+
+  "NOP" should "do nothing" in {
+    val values = Seq(
+      Value(1.U, 0.U, 0.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 0.U, "b0000_0000".U, "b0000_0000".U)
+    )
+
+    for (value <- values) {
+      test(new ALU) { testALU(Ops.NOP.U, value, _) }
+    }
   }
 
   "ADD" should "add the operands" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0000".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(64.U, 64.U, "b0000_0000".U, 128.U, "b1000_0100".U),
-      Value(255.U, 1.U, "b0000_0000".U, 0.U, "b0101_0001".U),
+      Value(0.U, 0.U, 0.U, "b0000_0001".U, "b0100_0000".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(64.U, 64.U, 128.U, "b0000_0000".U, "b1000_0100".U),
+      Value(255.U, 1.U, 0.U, "b0000_0000".U, "b0101_0001".U),
     )
 
     for (value <- values) {
@@ -70,11 +81,11 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "ADC" should "add the operands with carry" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0000".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(64.U, 64.U, "b0000_0000".U, 128.U, "b1000_0100".U),
-      Value(255.U, 1.U, "b0000_0000".U, 0.U, "b0101_0001".U),
+      Value(0.U, 0.U, 1.U, "b0000_0001".U, "b0000_0000".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(64.U, 64.U, 128.U, "b0000_0000".U, "b1000_0100".U),
+      Value(255.U, 1.U, 0.U, "b0000_0000".U, "b0101_0001".U),
     )
 
     for (value <- values) {
@@ -84,11 +95,11 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SUB" should "subtract the operands" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0010".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
-      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
-      Value(128.U, 128.U, "b0000_0000".U, 0.U, "b0100_0110".U),
-      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
+      Value(0.U, 0.U, 0.U, "b0000_0001".U, "b0100_0010".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0010".U),
+      Value(0.U, 1.U, 255.U, "b0000_0000".U, "b1001_0111".U),
+      Value(128.U, 128.U, 0.U, "b0000_0000".U, "b0100_0110".U),
+      Value(255.U, 1.U, 254.U, "b0000_0000".U, "b1000_0010".U),
     )
 
     for (value <- values) {
@@ -98,11 +109,11 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SBC" should "subtract the operands with carry" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 255.U, "b1001_0111".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
-      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
-      Value(128.U, 128.U, "b0000_0000".U, 0.U, "b0100_0110".U),
-      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
+      Value(0.U, 0.U, 255.U, "b0000_0001".U, "b1001_0111".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0010".U),
+      Value(0.U, 1.U, 255.U, "b0000_0000".U, "b1001_0111".U),
+      Value(128.U, 128.U, 0.U, "b0000_0000".U, "b0100_0110".U),
+      Value(255.U, 1.U, 254.U, "b0000_0000".U, "b1000_0010".U),
     )
 
     for (value <- values) {
@@ -112,11 +123,11 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "CP" should "compare the operands" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0001".U, 0.U, "b0100_0010".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0010".U),
-      Value(0.U, 1.U, "b0000_0000".U, 255.U, "b1001_0111".U),
-      Value(128.U, 128.U, "b0000_0000".U, 0.U, "b0100_0110".U),
-      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
+      Value(0.U, 0.U, 0.U, "b0000_0001".U, "b0100_0010".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0010".U),
+      Value(0.U, 1.U, 255.U, "b0000_0000".U, "b1001_0111".U),
+      Value(128.U, 128.U, 0.U, "b0000_0000".U, "b0100_0110".U),
+      Value(255.U, 1.U, 254.U, "b0000_0000".U, "b1000_0010".U),
     )
 
     for (value <- values) {
@@ -126,12 +137,12 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "AND" should "logical AND the operands" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
-      Value(1.U, 1.U, "b0000_0000".U, 1.U, "b0001_0000".U),
-      Value(255.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
-      Value(0.U, 255.U, "b0000_0000".U, 0.U, "b0101_0100".U),
-      Value(255.U, 255.U, "b0000_0000".U, 255.U, "b1001_0100".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0101_0100".U),
+      Value(1.U, 0.U, 0.U, "b0000_0000".U, "b0101_0100".U),
+      Value(1.U, 1.U, 1.U, "b0000_0000".U, "b0001_0000".U),
+      Value(255.U, 0.U, 0.U, "b0000_0000".U, "b0101_0100".U),
+      Value(0.U, 255.U, 0.U, "b0000_0000".U, "b0101_0100".U),
+      Value(255.U, 255.U, 255.U, "b0000_0000".U, "b1001_0100".U),
     )
 
     for (value <- values) {
@@ -141,13 +152,13 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "OR" should "logical OR the operands" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(1.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(255.U, 0.U, "b0000_0000".U, 255.U, "b1000_0100".U),
-      Value(0.U, 255.U, "b0000_0000".U, 255.U, "b1000_0100".U),
-      Value(255.U, 255.U, "b0000_0000".U, 255.U, "b1000_0100".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(1.U, 1.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(255.U, 0.U, 255.U, "b0000_0000".U, "b1000_0100".U),
+      Value(0.U, 255.U, 255.U, "b0000_0000".U, "b1000_0100".U),
+      Value(255.U, 255.U, 255.U, "b0000_0000".U, "b1000_0100".U),
     )
 
     for (value <- values) {
@@ -157,13 +168,13 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "XOR" should "logical XOR the operands" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(1.U, 1.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(255.U, 0.U, "b0000_0000".U, 255.U, "b1000_0100".U),
-      Value(0.U, 255.U, "b0000_0000".U, 255.U, "b1000_0100".U),
-      Value(255.U, 255.U, "b0000_0000".U, 0.U, "b0100_0100".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(1.U, 1.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(255.U, 0.U, 255.U, "b0000_0000".U, "b1000_0100".U),
+      Value(0.U, 255.U, 255.U, "b0000_0000".U, "b1000_0100".U),
+      Value(255.U, 255.U, 0.U, "b0000_0000".U, "b0100_0100".U),
     )
 
     for (value <- values) {
@@ -173,11 +184,11 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "INC" should "increment the operand" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(0.U, 0.U, "b0000_0001".U, 1.U, "b0000_0001".U),
-      Value(1.U, 0.U, "b0000_0000".U, 2.U, "b0000_0000".U),
-      Value(127.U, 0.U, "b0000_0000".U, 128.U, "b1001_0100".U),
-      Value(255.U, 1.U, "b0000_0000".U, 0.U, "b0101_0000".U),
+      Value(0.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 0.U, 1.U, "b0000_0001".U, "b0000_0001".U),
+      Value(1.U, 0.U, 2.U, "b0000_0000".U, "b0000_0000".U),
+      Value(127.U, 0.U, 128.U, "b0000_0000".U, "b1001_0100".U),
+      Value(255.U, 1.U, 0.U, "b0000_0000".U, "b0101_0000".U),
     )
 
     for (value <- values) {
@@ -187,11 +198,11 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "DEC" should "decrement the operand" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 255.U, "b1001_0010".U),
-      Value(0.U, 0.U, "b0000_0001".U, 255.U, "b1001_0011".U),
-      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0010".U),
-      Value(128.U, 0.U, "b0000_0000".U, 127.U, "b0001_0110".U),
-      Value(255.U, 1.U, "b0000_0000".U, 254.U, "b1000_0010".U),
+      Value(0.U, 0.U, 255.U, "b0000_0000".U, "b1001_0010".U),
+      Value(0.U, 0.U, 255.U, "b0000_0001".U, "b1001_0011".U),
+      Value(1.U, 0.U, 0.U, "b0000_0000".U, "b0100_0010".U),
+      Value(128.U, 0.U, 127.U, "b0000_0000".U, "b0001_0110".U),
+      Value(255.U, 1.U, 254.U, "b0000_0000".U, "b1000_0010".U),
     )
 
     for (value <- values) {
@@ -201,10 +212,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "BIT" should "test whether a bit is set" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0101_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0001_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 0.U, "b0101_0100".U),
-      Value(128.U, 7.U, "b0000_0000".U, 128.U, "b1001_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0101_0100".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0001_0000".U),
+      Value(0.U, 1.U, 0.U, "b0000_0000".U, "b0101_0100".U),
+      Value(128.U, 7.U, 128.U, "b0000_0000".U, "b1001_0000".U),
     )
 
     for (value <- values) {
@@ -214,10 +225,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SET" should "set a bit" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(1.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 2.U, "b0000_0000".U),
-      Value(128.U, 7.U, "b0000_0000".U, 128.U, "b0000_0000".U),
+      Value(0.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(1.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 2.U, "b0000_0000".U, "b0000_0000".U),
+      Value(128.U, 7.U, 128.U, "b0000_0000".U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -227,10 +238,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RES" should "reset a bit" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0000_0000".U),
-      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0000_0000".U),
-      Value(0.U, 1.U, "b0000_0000".U, 0.U, "b0000_0000".U),
-      Value(255.U, 7.U, "b0000_0000".U, 127.U, "b0000_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0000_0000".U),
+      Value(1.U, 0.U, 0.U, "b0000_0000".U, "b0000_0000".U),
+      Value(0.U, 1.U, 0.U, "b0000_0000".U, "b0000_0000".U),
+      Value(255.U, 7.U, 127.U, "b0000_0000".U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -240,10 +251,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RL" should "rotate the bits to the left" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0001".U, 3.U, "b0000_0100".U),
-      Value(64.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 3.U, "b0000_0001".U, "b0000_0100".U),
+      Value(64.U, 0.U, 128.U, "b0000_0000".U, "b1000_0000".U),
+      Value(128.U, 0.U, 0.U, "b0000_0000".U, "b0100_0101".U),
     )
 
     for (value <- values) {
@@ -253,10 +264,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RLC" should "rotate the bits to the left (circular)" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0001".U, 2.U, "b0000_0000".U),
-      Value(64.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 1.U, "b0000_0001".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 2.U, "b0000_0001".U, "b0000_0000".U),
+      Value(64.U, 0.U, 128.U, "b0000_0000".U, "b1000_0000".U),
+      Value(128.U, 0.U, 1.U, "b0000_0000".U, "b0000_0001".U),
     )
 
     for (value <- values) {
@@ -266,10 +277,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RR" should "rotate the bits to the right" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0001".U, 128.U, "b1000_0001".U),
-      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 128.U, "b0000_0001".U, "b1000_0001".U),
+      Value(64.U, 0.U, 32.U, "b0000_0000".U, "b0000_0000".U),
+      Value(128.U, 0.U, 64.U, "b0000_0000".U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -279,10 +290,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RRC" should "rotate the bits to the right (circular)" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 128.U, "b1000_0001".U),
-      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 128.U, "b0000_0000".U, "b1000_0001".U),
+      Value(64.U, 0.U, 32.U, "b0000_0000".U, "b0000_0000".U),
+      Value(128.U, 0.U, 64.U, "b0000_0000".U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -292,10 +303,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SLA" should "shift the bits to the left (arithmetic)" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 2.U, "b0000_0000".U),
-      Value(64.U, 0.U, "b0000_0000".U, 128.U, "b1000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 2.U, "b0000_0000".U, "b0000_0000".U),
+      Value(64.U, 0.U, 128.U, "b0000_0000".U, "b1000_0000".U),
+      Value(128.U, 0.U, 0.U, "b0000_0000".U, "b0100_0101".U),
     )
 
     for (value <- values) {
@@ -305,10 +316,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SLL" should "shift the bits to the left (logical)" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 1.U, "b0000_0000".U),
-      Value(1.U, 0.U, "b0000_0000".U, 3.U, "b0000_0100".U),
-      Value(64.U, 0.U, "b0000_0000".U, 129.U, "b1000_0100".U),
-      Value(128.U, 0.U, "b0000_0000".U, 1.U, "b0000_0001".U),
+      Value(0.U, 0.U, 1.U, "b0000_0000".U, "b0000_0000".U),
+      Value(1.U, 0.U, 3.U, "b0000_0000".U, "b0000_0100".U),
+      Value(64.U, 0.U, 129.U, "b0000_0000".U, "b1000_0100".U),
+      Value(128.U, 0.U, 1.U, "b0000_0000".U, "b0000_0001".U),
     )
 
     for (value <- values) {
@@ -318,10 +329,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SRA" should "shift the bits to the right (arithmetic)" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
-      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 192.U, "b1000_0100".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 0.U, "b0000_0000".U, "b0100_0101".U),
+      Value(64.U, 0.U, 32.U, "b0000_0000".U, "b0000_0000".U),
+      Value(128.U, 0.U, 192.U, "b0000_0000".U, "b1000_0100".U),
     )
 
     for (value <- values) {
@@ -331,10 +342,10 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "SRL" should "shift the bits to the right (logical)" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(1.U, 0.U, "b0000_0000".U, 0.U, "b0100_0101".U),
-      Value(64.U, 0.U, "b0000_0000".U, 32.U, "b0000_0000".U),
-      Value(128.U, 0.U, "b0000_0000".U, 64.U, "b0000_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(1.U, 0.U, 0.U, "b0000_0000".U, "b0100_0101".U),
+      Value(64.U, 0.U, 32.U, "b0000_0000".U, "b0000_0000".U),
+      Value(128.U, 0.U, 64.U, "b0000_0000".U, "b0000_0000".U),
     )
 
     for (value <- values) {
@@ -344,9 +355,9 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RLD" should "rotate the upper BCD digit" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(48.U, 16.U, "b0000_0000".U, 49.U, "b0000_0000".U),
-      Value(144.U, 16.U, "b0000_0000".U, 145.U, "b1000_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(48.U, 16.U, 49.U, "b0000_0000".U, "b0000_0000".U),
+      Value(144.U, 16.U, 145.U, "b0000_0000".U, "b1000_0000".U),
     )
 
     for (value <- values) {
@@ -356,9 +367,9 @@ class ALUTest extends FlatSpec with ChiselScalatestTester with Matchers {
 
   "RRD" should "rotate the lower BCD digit" in {
     val values = Seq(
-      Value(0.U, 0.U, "b0000_0000".U, 0.U, "b0100_0100".U),
-      Value(48.U, 1.U, "b0000_0000".U, 49.U, "b0000_0000".U),
-      Value(144.U, 1.U, "b0000_0000".U, 145.U, "b1000_0000".U),
+      Value(0.U, 0.U, 0.U, "b0000_0000".U, "b0100_0100".U),
+      Value(48.U, 1.U, 49.U, "b0000_0000".U, "b0000_0000".U),
+      Value(144.U, 1.U, 145.U, "b0000_0000".U, "b1000_0000".U),
     )
 
     for (value <- values) {
