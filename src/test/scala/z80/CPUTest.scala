@@ -130,9 +130,6 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       dut.io.halt.expect(false.B)
       dut.clock.step(4)
       dut.io.halt.expect(true.B)
-      dut.io.din.poke(Instructions.NOP.U)
-      dut.clock.step(4)
-      dut.io.halt.expect(true.B)
     }
   }
 }
