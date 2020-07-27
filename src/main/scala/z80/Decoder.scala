@@ -124,6 +124,7 @@ object Decoder {
     (INC_A -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.A)))),
     (INC_B -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.B)))),
     (LD_A  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.A), wr = true))),
+    (LD_B  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.B), wr = true))),
     (HALT  -> Seq(OpcodeFetch(halt = true))),
   )
 }

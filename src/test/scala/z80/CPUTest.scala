@@ -108,8 +108,19 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
       dut.clock.step(4)
       dut.io.din.poke(1.U)
       dut.io.debug.registers8(Reg8.A).expect(0.U)
-      dut.clock.step(4)
+      dut.clock.step(3)
       dut.io.debug.registers8(Reg8.A).expect(1.U)
+    }
+  }
+
+  "LD B" should "load a value into the B register" in {
+    test(new CPU) { dut =>
+      dut.io.din.poke(Instructions.LD_B.U)
+      dut.clock.step(4)
+      dut.io.din.poke(1.U)
+      dut.io.debug.registers8(Reg8.B).expect(0.U)
+      dut.clock.step(3)
+      dut.io.debug.registers8(Reg8.B).expect(1.U)
     }
   }
 

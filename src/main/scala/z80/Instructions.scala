@@ -41,6 +41,7 @@ package z80
 object Instructions {
   def NOP    = 0x00
   def INC_B  = 0x04
+  def LD_B   = 0x06
   def INC_C  = 0x0c
   def INC_D  = 0x14
   def INC_E  = 0x1c
