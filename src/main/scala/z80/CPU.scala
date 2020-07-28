@@ -88,11 +88,9 @@ class CPU extends Module {
     }
   })
 
-  // T-states
-  val t1 :: t2 :: t3 :: t4 :: Nil = Enum(4)
-
-  // Timing state register
-  val tStateReg = RegInit(t1)
+  // Timing state counter
+  val tStateEnable = WireInit(false.B)
+  val (tStateCounter, tStateWrap) = Counter(tStateEnable, 4)
 
   // Machine cycle register
   val mCycleReg = RegInit(0.U(log2Up(CPU.MAX_M_CYCLES)))
@@ -133,15 +131,15 @@ class CPU extends Module {
   io.addr := 0.U
   io.dout := 0.U
   io.m1 := false.B
-  io.debug.tState := tStateReg
+  io.debug.tState := tStateCounter
   io.debug.mCycle := mCycleReg
   io.debug.registers8 := registers8
   io.debug.registers16 := registers16
 
-  printf(p"T: $tStateReg, M: $mCycleReg, PC: $pcReg, IR: $instructionReg, dinReg: ${dinReg}\n")
+  printf(p"T: $tStateCounter, M: $mCycleReg, PC: $pcReg, IR: $instructionReg, dinReg: ${dinReg}\n")
 
-  switch (tStateReg) {
-    is(t1) {
+  switch (tStateCounter) {
+    is(0.U) {
       // Increment program counter
       pcReg := pcReg + 1.U
 
@@ -151,10 +149,10 @@ class CPU extends Module {
       // Assert M1 during first machine cycle
       io.m1 := mCycleReg === 0.U
 
-      tStateReg := t2
+      tStateEnable := true.B
     }
 
-    is(t2) {
+    is(1.U) {
       // Fetch instruction
       io.mreq := true.B
       io.rd := true.B
@@ -162,10 +160,10 @@ class CPU extends Module {
       // Assert M1 during first machine cycle
       io.m1 := mCycleReg === 0.U
 
-      tStateReg := t3
+      tStateEnable := true.B
     }
 
-    is(t3) {
+    is(2.U) {
       // Latch an instruction only during first machine cycle. If the CPU is halted
       // then a NOP is forced.
       when(mCycleReg === 0.U) {
@@ -177,10 +175,10 @@ class CPU extends Module {
         registers8(decoder.io.busIndex) := io.din
       }
 
-      tStateReg := t4
+      tStateEnable := true.B
     }
 
-    is(t4) {
+    is(3.U) {
       // Write the result from the ALU to the register bus
       when(!decoder.io.wr) {
         registers8(decoder.io.busIndex) := alu.io.result
@@ -199,7 +197,7 @@ class CPU extends Module {
         mCycleReg := mCycleReg + 1.U
       }
 
-      tStateReg := t1
+      tStateEnable := true.B
     }
   }
 }
