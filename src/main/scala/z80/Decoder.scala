@@ -38,7 +38,6 @@
 package z80
 
 import chisel3._
-import chisel3.util._
 
 sealed trait Cycle
 
@@ -59,10 +58,14 @@ class Decoder extends Module {
   val io = IO(new Bundle {
     /** Instruction */
     val instruction = Input(UInt(8.W))
+    /** Time state */
+    val tState = Input(UInt(3.W))
     /** Machine cycle */
-    val mCycle = Input(UInt(log2Up(CPU.MAX_M_CYCLES).W))
-    /** Asserted when the machine cycle counter should be reset */
-    val mCycleReset = Output(Bool())
+    val mCycle = Input(UInt(3.W))
+    /** Number of time states required for the current machine cycle */
+    val tStates = Output(UInt(3.W))
+    /** Number of machine cycles required for the current instruction */
+    val mCycles = Output(UInt(3.W))
     /** Operation */
     val op = Output(UInt(5.W))
     /** Register bus index */
@@ -85,6 +88,7 @@ class Decoder extends Module {
         io.halt := halt.B
 
       case MemRead(busIndex, store) =>
+        io.tStates := 3.U
         io.op := Ops.NOP.U
         busIndex match {
           case Some(i) => io.busIndex := i.U
@@ -95,21 +99,20 @@ class Decoder extends Module {
   }
 
   // Default outputs
+  io.tStates := 4.U
+  io.mCycles := 1.U
   io.op := 0.U
   io.busIndex := 0.U
-  io.halt := false.B
-  io.mCycleReset := false.B
   io.wr := false.B
+  io.halt := false.B
 
   // Decode the instructions
   for ((code, cycles) <- Decoder.instructions) {
     when(io.instruction === code.U) {
+      io.mCycles := cycles.length.U
       for ((cycle, i) <- cycles.zipWithIndex) {
         when(io.mCycle === i.U) {
           decodeCycle(cycle)
-
-          // Reset the machine cycle during the last cycle of the instruction
-          io.mCycleReset := (i == cycles.length-1).B
         }
       }
     }
@@ -120,11 +123,11 @@ object Decoder {
   import Instructions._
 
   val instructions = Seq(
-    (NOP   -> Seq(OpcodeFetch())),
-    (INC_A -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.A)))),
-    (INC_B -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.B)))),
-    (LD_A  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.A), wr = true))),
-    (LD_B  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.B), wr = true))),
-    (HALT  -> Seq(OpcodeFetch(halt = true))),
+    NOP   -> Seq(OpcodeFetch()),
+    INC_A -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.A))),
+    INC_B -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.B))),
+    LD_A  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.A), wr = true)),
+    LD_B  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.B), wr = true)),
+    HALT  -> Seq(OpcodeFetch(halt = true))
   )
 }

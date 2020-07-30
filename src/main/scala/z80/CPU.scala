@@ -38,7 +38,7 @@
 package z80
 
 import chisel3._
-import chisel3.util._
+import chisel3.util.{is, _}
 
 /** 8-bit registers */
 object Reg8 {
@@ -88,12 +88,13 @@ class CPU extends Module {
     }
   })
 
-  // Timing state counter
-  val tStateEnable = WireInit(false.B)
-  val (tStateCounter, tStateWrap) = Counter(tStateEnable, 4)
+  // Time state counter
+  val tStates = Wire(UInt(3.W))
+  val (tStateCounter, tStateWrap) = Counter(tStates)
 
-  // Machine cycle register
-  val mCycleReg = RegInit(0.U(log2Up(CPU.MAX_M_CYCLES)))
+  // Machine cycle counter
+  val mCycles = Wire(UInt(3.W))
+  val (mCycleCounter, mCycleWrap) = Counter(mCycles, enable = tStateWrap)
 
   // Program counter register
   val pcReg = RegInit(0.U(CPU.ADDR_WIDTH.W))
@@ -104,14 +105,20 @@ class CPU extends Module {
   // Data input register
   val dinReg = RegInit(0.U(CPU.DATA_WIDTH.W))
 
+  // Halt register
+  val haltReg = RegInit(false.B)
+
   // Register files
   val registers16 = RegInit(VecInit(Seq.fill(CPU.NUM_REG_16) { 0.U(16.W) }))
   val registers8 = RegInit(VecInit(registers16.take(CPU.NUM_REG_8/2).flatMap { r => Seq(r(15, 8), r(7, 0)) }))
 
   // Instruction decoder
   val decoder = Module(new Decoder)
-  decoder.io.mCycle := mCycleReg
   decoder.io.instruction := instructionReg
+  decoder.io.tState := tStateCounter
+  decoder.io.mCycle := mCycleCounter
+  tStates := decoder.io.tStates
+  mCycles := decoder.io.mCycles
 
   // Arithmetic logic unit
   val alu = Module(new ALU)
@@ -119,9 +126,6 @@ class CPU extends Module {
   alu.io.a := registers8(decoder.io.busIndex)
   alu.io.b := registers8(Reg8.A.U)
   alu.io.flagsIn := registers8(Reg8.F)
-
-  // Halt register
-  val haltReg = RegInit(false.B)
 
   // Default outputs
   io.mreq := false.B
@@ -132,13 +136,13 @@ class CPU extends Module {
   io.dout := 0.U
   io.m1 := false.B
   io.debug.tState := tStateCounter
-  io.debug.mCycle := mCycleReg
+  io.debug.mCycle := mCycleCounter
   io.debug.registers8 := registers8
   io.debug.registers16 := registers16
 
-  printf(p"T: $tStateCounter, M: $mCycleReg, PC: $pcReg, IR: $instructionReg, dinReg: ${dinReg}\n")
+  printf(p"T: $tStateCounter ($tStates), M: $mCycleCounter ($mCycles), PC: $pcReg, IR: $instructionReg, dinReg: $dinReg\n")
 
-  switch (tStateCounter) {
+  switch(tStateCounter) {
     is(0.U) {
       // Increment program counter
       pcReg := pcReg + 1.U
@@ -147,9 +151,7 @@ class CPU extends Module {
       io.addr := pcReg
 
       // Assert M1 during first machine cycle
-      io.m1 := mCycleReg === 0.U
-
-      tStateEnable := true.B
+      io.m1 := mCycleCounter === 0.U
     }
 
     is(1.U) {
@@ -158,15 +160,13 @@ class CPU extends Module {
       io.rd := true.B
 
       // Assert M1 during first machine cycle
-      io.m1 := mCycleReg === 0.U
-
-      tStateEnable := true.B
+      io.m1 := mCycleCounter === 0.U
     }
 
     is(2.U) {
       // Latch an instruction only during first machine cycle. If the CPU is halted
       // then a NOP is forced.
-      when(mCycleReg === 0.U) {
+      when(mCycleCounter === 0.U) {
         instructionReg := Mux(haltReg, Instructions.NOP.U, io.din)
       }
 
@@ -174,8 +174,6 @@ class CPU extends Module {
       when(decoder.io.wr) {
         registers8(decoder.io.busIndex) := io.din
       }
-
-      tStateEnable := true.B
     }
 
     is(3.U) {
@@ -189,15 +187,6 @@ class CPU extends Module {
 
       // Set halt register
       haltReg := haltReg || decoder.io.halt
-
-      // Set machine cycle
-      when(decoder.io.mCycleReset) {
-        mCycleReg := 0.U
-      } otherwise {
-        mCycleReg := mCycleReg + 1.U
-      }
-
-      tStateEnable := true.B
     }
   }
 }
@@ -205,7 +194,6 @@ class CPU extends Module {
 object CPU {
   val ADDR_WIDTH = 16
   val DATA_WIDTH = 8
-  val MAX_M_CYCLES = 8
   val NUM_REG_8 = 8
   val NUM_REG_16 = 8
 }
