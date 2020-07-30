@@ -44,36 +44,71 @@ import org.scalatest._
 class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior of "instructions"
 
-  it should "NOP" in {
+  "NOP" should "select NOP operation" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.NOP.U)
       dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(0.U)
     }
   }
 
-  it should "INC A" in {
+  "INC A" should "select INC operation" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.INC_A.U)
       dut.io.op.expect(Ops.INC.U)
+    }
+  }
+
+  it should "write to the bus" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.INC_A.U)
       dut.io.busIndex.expect(Reg8.A.U)
     }
   }
 
-  it should "INC B" in {
+  "INC B" should "select INC operation" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.INC_B.U)
       dut.io.op.expect(Ops.INC.U)
+    }
+  }
+
+  it should "write to the bus" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.INC_B.U)
       dut.io.busIndex.expect(Reg8.B.U)
     }
   }
 
-  it should "LD A" in {
+  "LD A" should "select NOP operation" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.LD_A.U)
-      dut.io.mCycle.poke(0.U)
       dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(0.U)
+    }
+  }
+
+  it should "write to the bus" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.LD_A.U)
+      dut.io.mCycle.poke(1.U)
+      dut.io.busIndex.expect(Reg8.A.U)
+      dut.io.wr.expect(true.B)
+    }
+  }
+
+  "LD B" should "select NOP operation" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.LD_B.U)
+      dut.io.op.expect(Ops.NOP.U)
+    }
+  }
+
+  it should "write to the bus" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.LD_B.U)
+      dut.io.mCycle.poke(1.U)
+      dut.io.op.expect(Ops.NOP.U)
+      dut.io.busIndex.expect(Reg8.B.U)
+      dut.io.wr.expect(true.B)
     }
   }
 
