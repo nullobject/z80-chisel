@@ -62,6 +62,7 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.INC_A.U)
       dut.io.busIndex.expect(Reg8.A.U)
+      dut.io.wr.expect(true.B)
     }
   }
 
@@ -76,6 +77,7 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.INC_B.U)
       dut.io.busIndex.expect(Reg8.B.U)
+      dut.io.wr.expect(true.B)
     }
   }
 

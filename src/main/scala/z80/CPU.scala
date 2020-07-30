@@ -178,7 +178,7 @@ class CPU extends Module {
 
     is(3.U) {
       // Write the result from the ALU to the register bus
-      when(!decoder.io.wr) {
+      when(decoder.io.wr) {
         registers8(decoder.io.busIndex) := alu.io.result
       }
 

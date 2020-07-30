@@ -42,7 +42,7 @@ import chisel3._
 sealed trait Cycle
 
 /** Represents a cycle where an opcode is fetched */
-case class OpcodeFetch(op: Int = Ops.NOP, busIndex: Option[Int] = None, halt: Boolean = false) extends Cycle
+case class OpcodeFetch(op: Int = Ops.NOP, busIndex: Option[Int] = None, wr: Boolean = false, halt: Boolean = false) extends Cycle
 
 /** Represents a cycle where a value is read from memory */
 case class MemRead(busIndex: Option[Int] = None, wr: Boolean = false) extends Cycle
@@ -79,22 +79,23 @@ class Decoder extends Module {
   /** Decodes the given microcode and sets the operation and register index outputs. */
   private def decodeCycle(cycle: Cycle) = {
     cycle match {
-      case OpcodeFetch(op, busIndex, halt) =>
+      case OpcodeFetch(op, busIndex, wr, halt) =>
         io.op := op.U
         busIndex match {
           case Some(i) => io.busIndex := i.U
           case None =>
         }
+        io.wr := wr.B
         io.halt := halt.B
 
-      case MemRead(busIndex, store) =>
+      case MemRead(busIndex, wr) =>
         io.tStates := 3.U
         io.op := Ops.NOP.U
         busIndex match {
           case Some(i) => io.busIndex := i.U
           case None =>
         }
-        io.wr := store.B
+        io.wr := wr.B
     }
   }
 
@@ -124,8 +125,8 @@ object Decoder {
 
   val instructions = Seq(
     NOP   -> Seq(OpcodeFetch()),
-    INC_A -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.A))),
-    INC_B -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.B))),
+    INC_A -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.A), wr = true)),
+    INC_B -> Seq(OpcodeFetch(op = Ops.INC, busIndex = Some(Reg8.B), wr = true)),
     LD_A  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.A), wr = true)),
     LD_B  -> Seq(OpcodeFetch(), MemRead(busIndex = Some(Reg8.B), wr = true)),
     HALT  -> Seq(OpcodeFetch(halt = true))
