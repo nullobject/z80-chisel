@@ -41,49 +41,47 @@ import chisel3._
 import chiseltest._
 import org.scalatest._
 
-class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
-  behavior of "instructions"
-
-  it should "NOP" in {
-    test(new Decoder) { dut =>
-      dut.io.instruction.poke(Instructions.NOP.U)
-      dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(0.U)
+class CounterTest extends FlatSpec with ChiselScalatestTester with Matchers {
+  "counter" should "increment the value when ENABLE is asserted" in {
+    test(new Counter(2.W)) { dut =>
+      dut.io.n.poke(4.U)
+      dut.clock.step()
+      dut.io.enable.poke(true.B)
+      dut.io.value.expect(0.U)
+      dut.clock.step()
+      dut.io.value.expect(1.U)
     }
   }
 
-  it should "INC A" in {
-    test(new Decoder) { dut =>
-      dut.io.instruction.poke(Instructions.INC_A.U)
-      dut.io.op.expect(Ops.INC.U)
-      dut.io.busIndex.expect(Reg8.A.U)
+  it should "wrap when the value reaches the maximum" in {
+    test(new Counter(2.W)) { dut =>
+      dut.io.n.poke(4.U)
+      dut.io.enable.poke(true.B)
+      dut.io.value.expect(0.U)
+      dut.clock.step(4)
+      dut.io.value.expect(0.U)
     }
   }
 
-  it should "INC B" in {
-    test(new Decoder) { dut =>
-      dut.io.instruction.poke(Instructions.INC_B.U)
-      dut.io.op.expect(Ops.INC.U)
-      dut.io.busIndex.expect(Reg8.B.U)
+  it should "assert the WRAP signal when the value reaches the maximum" in {
+    test(new Counter(2.W)) { dut =>
+      dut.io.n.poke(4.U)
+      dut.io.enable.poke(true.B)
+      dut.io.wrap.expect(false.B)
+      dut.clock.step(3)
+      dut.io.wrap.expect(true.B)
     }
   }
 
-  it should "LD A" in {
-    test(new Decoder) { dut =>
-      dut.io.instruction.poke(Instructions.LD_A.U)
-      dut.io.mCycle.poke(0.U)
-      dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(0.U)
-    }
-  }
-
-  it should "HALT" in {
-    test(new Decoder) { dut =>
-      dut.io.instruction.poke(Instructions.HALT.U)
-      dut.io.mCycle.poke(0.U)
-      dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(0.U)
-      dut.io.halt.expect(true.B)
+  it should "reset the value to zero when RESET is asserted" in {
+    test(new Counter(2.W)) { dut =>
+      dut.io.n.poke(4.U)
+      dut.io.enable.poke(true.B)
+      dut.clock.step()
+      dut.io.reset.poke(true.B)
+      dut.io.value.expect(1.U)
+      dut.clock.step()
+      dut.io.value.expect(0.U)
     }
   }
 }

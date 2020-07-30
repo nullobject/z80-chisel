@@ -3,7 +3,7 @@ jdk: openjdk8
 scala:
    - 2.12.10
 script:
-   - make
+   - sbt test
 cache:
   directories:
     - $HOME/.cache/coursier

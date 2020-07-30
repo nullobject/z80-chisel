@@ -37,18 +37,34 @@
 
 package z80
 
-/** Instruction set */
-object Instructions {
-  def NOP    = 0x00
-  def INC_B  = 0x04
-  def LD_B   = 0x06
-  def INC_C  = 0x0c
-  def INC_D  = 0x14
-  def INC_E  = 0x1c
-  def INC_H  = 0x24
-  def INC_L  = 0x2c
-  def INC_HL = 0x34
-  def INC_A  = 0x3c
-  def LD_A   = 0x3e
-  def HALT   = 0x76
+import chisel3._
+import chisel3.internal.firrtl.Width
+
+class Counter(width: Width) extends Module {
+  val io = IO(new Bundle {
+    val n = Input(UInt(width))
+    val enable = Input(Bool())
+    val reset = Input(Bool())
+    val value = Output(UInt(width))
+    val wrap = Output(Bool())
+  })
+
+  private val valueReg = RegInit(0.U(width))
+  private val wrap = valueReg === io.n - 1.U
+
+  when(io.enable) { valueReg := valueReg + 1.U }
+  when(io.reset || (io.enable && wrap)) { valueReg := 0.U }
+
+  io.value := valueReg
+  io.wrap := wrap
+}
+
+object Counter {
+  def apply(n: UInt, enable: Bool = true.B, reset: Bool = false.B): (UInt, Bool) = {
+    val counter = Module(new Counter(4.W))
+    counter.io.n := n
+    counter.io.enable := enable
+    counter.io.reset := reset
+    (counter.io.value, counter.io.wrap)
+  }
 }

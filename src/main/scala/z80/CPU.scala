@@ -38,11 +38,17 @@
 package z80
 
 import chisel3._
-import chisel3.util._
+import chisel3.util.{is, _}
 
-/**
- * 16-bit registers
- */
+/** 8-bit registers */
+object Reg8 {
+  val A = 0; val F = 1
+  val B = 2; val C = 3
+  val D = 4; val E = 5
+  val H = 6; val L = 7
+}
+
+/** 16-bit registers */
 object Reg16 {
   val AF = 0
   val BC = 1
@@ -51,151 +57,143 @@ object Reg16 {
   val IX = 4
   val IY = 5
   val SP = 6
-  val WZ = 7 // internal
+  val PC = 7
 }
 
-/**
- * 8-bit registers
- */
-object Reg8 {
-  val A = 0; val F = 1
-  val B = 2; val C = 3
-  val D = 4; val E = 5
-  val H = 6; val L = 7
-}
-
-/**
- * Z80 CPU
- */
+/** Z80 CPU */
 class CPU extends Module {
-  val DATA_WIDTH = 8
-  val ADDR_WIDTH = 16
-
   val io = IO(new Bundle {
-    /**
-     * memory request
-     */
+    /** Memory request */
     val mreq = Output(Bool())
-
-    /**
-     * read
-     */
+    /** Read */
     val rd = Output(Bool())
-
-    /**
-     * write
-     */
+    /** Write */
     val wr = Output(Bool())
-
-    /**
-     * halt state
-     */
+    /** Halt state */
     val halt = Output(Bool())
-
-    /**
-     * address bus
-     */
-    val addr = Output(UInt(ADDR_WIDTH.W))
-
-    /**
-     * data input
-     */
-    val din = Input(UInt(DATA_WIDTH.W))
-
-    /**
-     * data output
-     */
-    val dout = Output(UInt(DATA_WIDTH.W))
-
-    /**
-     * M1 cycle
-     */
+    /** Address bus */
+    val addr = Output(UInt(CPU.ADDR_WIDTH.W))
+    /** Data input */
+    val din = Input(UInt(CPU.DATA_WIDTH.W))
+    /** Data output */
+    val dout = Output(UInt(CPU.DATA_WIDTH.W))
+    /** M1 cycle */
     val m1 = Output(Bool())
-
-    /**
-     * debug output
-     */
-    val registers8  = Output(Vec(16, UInt(8.W)))
-    val registers16 = Output(Vec(8, UInt(16.W)))
+    /** Debug output */
+    val debug = new Bundle {
+      val tState = Output(UInt(2.W))
+      val mCycle = Output(UInt(2.W))
+      val registers8 = Output(Vec(CPU.NUM_REG_8, UInt(8.W)))
+      val registers16 = Output(Vec(CPU.NUM_REG_16, UInt(16.W)))
+    }
   })
 
-  // 16-bit register file
-  val registers16 = RegInit(VecInit(Seq.fill(8) { 0.U(16.W) }))
+  // Time state counter
+  val tStates = Wire(UInt(3.W))
+  val (tStateCounter, tStateWrap) = Counter(tStates)
 
-  // 8-bit register file
-  val registers8 = Reg(Vec(16, UInt(8.W)))
-  registers8 := registers16.flatMap { r => Seq(r(15, 8), r(7, 0)) }
+  // Machine cycle counter
+  val mCycles = Wire(UInt(3.W))
+  val (mCycleCounter, mCycleWrap) = Counter(mCycles, enable = tStateWrap)
 
-  // instruction register
-  val pc = RegInit(0.U(ADDR_WIDTH.W))
-  val ir = RegInit(0.U(DATA_WIDTH.W))
+  // Program counter register
+  val pcReg = RegInit(0.U(CPU.ADDR_WIDTH.W))
 
-  // data input register
-  val dataIn = RegNext(io.din, 0.U(DATA_WIDTH.W))
+  // Instruction register
+  val instructionReg = RegInit(0.U(CPU.DATA_WIDTH.W))
 
-  // instruction decoder
+  // Data input register
+  val dinReg = RegInit(0.U(CPU.DATA_WIDTH.W))
+
+  // Halt register
+  val haltReg = RegInit(false.B)
+
+  // Register files
+  val registers16 = RegInit(VecInit(Seq.fill(CPU.NUM_REG_16) { 0.U(16.W) }))
+  val registers8 = RegInit(VecInit(registers16.take(CPU.NUM_REG_8/2).flatMap { r => Seq(r(15, 8), r(7, 0)) }))
+
+  // Instruction decoder
   val decoder = Module(new Decoder)
-  decoder.io.ir := ir
+  decoder.io.instruction := instructionReg
+  decoder.io.tState := tStateCounter
+  decoder.io.mCycle := mCycleCounter
+  tStates := decoder.io.tStates
+  mCycles := decoder.io.mCycles
 
-  // arithmetic logic unit
+  // Arithmetic logic unit
   val alu = Module(new ALU)
   alu.io.op := decoder.io.op
-  alu.io.a := registers8(Reg8.A)
-  alu.io.b := registers8(decoder.io.indexB)
+  alu.io.a := registers8(decoder.io.busIndex)
+  alu.io.b := registers8(Reg8.A.U)
   alu.io.flagsIn := registers8(Reg8.F)
 
-  val halt = RegInit(false.B)
-
-  // default outputs
+  // Default outputs
   io.mreq := false.B
   io.rd := false.B
   io.wr := false.B
-  io.halt := halt
+  io.halt := haltReg
   io.addr := 0.U
   io.dout := 0.U
   io.m1 := false.B
+  io.debug.tState := tStateCounter
+  io.debug.mCycle := mCycleCounter
+  io.debug.registers8 := registers8
+  io.debug.registers16 := registers16
 
-  val t1 :: t2 :: t3 :: t4 :: Nil = Enum(4)
-  val stateReg = RegInit(t1)
+  printf(p"T: $tStateCounter ($tStates), M: $mCycleCounter ($mCycles), PC: $pcReg, IR: $instructionReg, dinReg: $dinReg\n")
 
-  switch (stateReg) {
-    is (t1) {
-      // place the program counter on the address bus
-      io.addr := pc
+  switch(tStateCounter) {
+    is(0.U) {
+      // Increment program counter
+      pcReg := pcReg + 1.U
 
-      // assert M1
-      io.m1 := true.B
+      // Place program counter on the address bus
+      io.addr := pcReg
 
-      stateReg := t2
+      // Assert M1 during first machine cycle
+      io.m1 := mCycleCounter === 0.U
     }
-    is (t2) {
-      // fetch instruction
+
+    is(1.U) {
+      // Fetch instruction
       io.mreq := true.B
       io.rd := true.B
 
-      // assert M1
-      io.m1 := true.B
-
-      stateReg := t3
+      // Assert M1 during first machine cycle
+      io.m1 := mCycleCounter === 0.U
     }
-    is (t3) {
-      // latch instruction
-      ir := io.din
 
-      stateReg := t4
+    is(2.U) {
+      // Latch an instruction only during first machine cycle. If the CPU is halted
+      // then a NOP is forced.
+      when(mCycleCounter === 0.U) {
+        instructionReg := Mux(haltReg, Instructions.NOP.U, io.din)
+      }
+
+      // Write the data input to the register bus.
+      when(decoder.io.wr) {
+        registers8(decoder.io.busIndex) := io.din
+      }
     }
-    is (t4) {
-      // store ALU result to the target register
-      registers8(decoder.io.indexA) := alu.io.result
 
-      // increment program counter
-      when (!halt) { pc := pc + 1.U }
+    is(3.U) {
+      // Write the result from the ALU to the register bus
+      when(!decoder.io.wr) {
+        registers8(decoder.io.busIndex) := alu.io.result
+      }
 
-      stateReg := t1
+      // Write the flags from the ALU to the F register
+      registers8(Reg8.F) := alu.io.flagsOut
+
+      // Set halt register
+      haltReg := haltReg || decoder.io.halt
     }
   }
+}
 
-  // set debug output
-  io.registers8 <> registers8
-  io.registers16 <> registers16
+object CPU {
+  val ADDR_WIDTH = 16
+  val DATA_WIDTH = 8
+  val NUM_REG_8 = 8
+  val NUM_REG_16 = 8
 }

@@ -14,7 +14,7 @@
  * https://twitter.com/nullobject
  * https://github.com/nullobject
  *
- * Copyright (c) 2020 Josh Bassett
+ * Copyright (dut) 2020 Josh Bassett
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,54 +42,94 @@ import chiseltest._
 import org.scalatest._
 
 class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
-  behavior of "CPU"
+  behavior of "FSM"
 
   it should "assert M1 during T1 and T2" in {
-    test(new CPU) { c =>
-      c.io.m1.expect(true.B) // T1
-      c.clock.step()
-      c.io.m1.expect(true.B) // T2
-      c.clock.step()
-      c.io.m1.expect(false.B) // T3
-      c.clock.step()
-      c.io.m1.expect(false.B) // T4
+    test(new CPU) { dut =>
+      dut.io.m1.expect(true.B) // T1
+      dut.clock.step()
+      dut.io.m1.expect(true.B) // T2
+      dut.clock.step()
+      dut.io.m1.expect(false.B) // T3
+      dut.clock.step()
+      dut.io.m1.expect(false.B) // T4
     }
   }
 
   it should "fetch an instruction during T2" in {
-    test(new CPU) { c =>
-      c.io.mreq.expect(false.B)
-      c.io.rd.expect(false.B)
-      c.clock.step()
-      c.io.mreq.expect(true.B)
-      c.io.rd.expect(true.B)
-      c.clock.step(cycles = 2)
-      c.io.mreq.expect(false.B)
-      c.io.rd.expect(false.B)
+    test(new CPU) { dut =>
+      dut.io.mreq.expect(false.B)
+      dut.io.rd.expect(false.B)
+      dut.clock.step()
+      dut.io.mreq.expect(true.B)
+      dut.io.rd.expect(true.B)
+      dut.clock.step()
+      dut.io.mreq.expect(false.B)
+      dut.io.rd.expect(false.B)
+      dut.clock.step()
+      dut.io.mreq.expect(false.B)
+      dut.io.rd.expect(false.B)
     }
   }
+
+  behavior of "program counter"
 
   it should "increment the program counter every four clock cycles" in {
-    test(new CPU) { c =>
-      c.io.addr.expect(0x00.U)
-      c.clock.step(4)
-      c.io.addr.expect(0x01.U)
+    test(new CPU) { dut =>
+      dut.io.addr.expect(0.U)
+      dut.clock.step(4)
+      dut.io.addr.expect(1.U)
+      dut.clock.step(4)
+      dut.io.addr.expect(2.U)
     }
   }
 
-  it should "execute a INC A instruction" in {
-    test(new CPU) { c =>
-      c.io.din.poke(Instructions.INC_A.U)
-      c.clock.step(4)
-      c.io.registers8(Reg8.A).expect(0x01.U)
+  "INC A" should "increment the A register" in {
+    test(new CPU) { dut =>
+      dut.io.din.poke(Instructions.INC_A.U)
+      dut.io.debug.registers8(Reg8.A).expect(0.U)
+      dut.clock.step(4)
+      dut.io.debug.registers8(Reg8.A).expect(1.U)
     }
   }
 
-  it should "execute a INC B instruction" in {
-    test(new CPU) { c =>
-      c.io.din.poke(Instructions.INC_B.U)
-      c.clock.step(4)
-      c.io.registers8(Reg8.B).expect(0x01.U)
+  "INC B" should "increment the B register" in {
+    test(new CPU) { dut =>
+      dut.io.din.poke(Instructions.INC_B.U)
+      dut.io.debug.registers8(Reg8.B).expect(0.U)
+      dut.clock.step(4)
+      dut.io.debug.registers8(Reg8.B).expect(1.U)
+    }
+  }
+
+  "LD A" should "load a value into the A register" in {
+    test(new CPU) { dut =>
+      dut.io.din.poke(Instructions.LD_A.U)
+      dut.clock.step(4)
+      dut.io.din.poke(1.U)
+      dut.io.debug.registers8(Reg8.A).expect(0.U)
+      dut.clock.step(3)
+      dut.io.debug.registers8(Reg8.A).expect(1.U)
+    }
+  }
+
+  "LD B" should "load a value into the B register" in {
+    test(new CPU) { dut =>
+      dut.io.din.poke(Instructions.LD_B.U)
+      dut.clock.step(4)
+      dut.io.din.poke(1.U)
+      dut.io.debug.registers8(Reg8.B).expect(0.U)
+      dut.clock.step(3)
+      dut.io.debug.registers8(Reg8.B).expect(1.U)
+    }
+  }
+
+  "HALT" should "halt the CPU" in {
+    test(new CPU) { dut =>
+      dut.io.din.poke(Instructions.HALT.U)
+      dut.io.halt.expect(false.B)
+      dut.clock.step(4)
+      dut.io.halt.expect(true.B)
     }
   }
 }

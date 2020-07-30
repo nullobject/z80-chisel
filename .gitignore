@@ -1,4 +1,5 @@
 .idea
+.run
 project/target
 target
 test_run_dir
