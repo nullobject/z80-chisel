@@ -41,7 +41,22 @@ import chisel3._
 import chiseltest._
 import org.scalatest._
 
-class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers {
+trait CPUTestHelpers {
+  def loadReg(cpu: CPU, reg: Int, value: Int) = {
+    val instruction = reg match {
+      case Reg8.A => Instructions.LD_A
+      case Reg8.B => Instructions.LD_B
+    }
+    cpu.io.din.poke(instruction.U)
+    cpu.clock.step(4)
+    cpu.io.din.poke(value.U)
+    cpu.io.debug.registers8(reg).expect(0.U)
+    cpu.clock.step(3)
+    cpu.io.debug.registers8(reg).expect(value.U)
+  }
+}
+
+class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers with CPUTestHelpers {
   behavior of "FSM"
 
   it should "assert M1 during T1 and T2" in {
