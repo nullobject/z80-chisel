@@ -14,7 +14,7 @@
  * https://twitter.com/nullobject
  * https://github.com/nullobject
  *
- * Copyright (dut) 2020 Josh Bassett
+ * Copyright (c) 2020 Josh Bassett
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -73,11 +73,11 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers with CPU
 
   it should "fetch an instruction during T2" in {
     test(new CPU) { dut =>
-      dut.io.mreq.expect(false.B)
-      dut.io.rd.expect(false.B)
-      dut.clock.step()
       dut.io.mreq.expect(true.B)
       dut.io.rd.expect(true.B)
+      dut.clock.step()
+      dut.io.mreq.expect(false.B)
+      dut.io.rd.expect(false.B)
       dut.clock.step()
       dut.io.mreq.expect(false.B)
       dut.io.rd.expect(false.B)
@@ -136,6 +136,27 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers with CPU
       dut.io.debug.registers8(Reg8.B).expect(0.U)
       dut.clock.step(3)
       dut.io.debug.registers8(Reg8.B).expect(1.U)
+    }
+  }
+
+  "ADD A" should "add the A register to accumulator" in {
+    test(new CPU) { dut =>
+      loadReg(dut, Reg8.A, 1)
+      dut.io.din.poke(Instructions.ADD_A.U)
+      dut.io.debug.registers8(Reg8.A).expect(1.U)
+      dut.clock.step(4)
+      dut.io.debug.registers8(Reg8.A).expect(2.U)
+    }
+  }
+
+  "ADD B" should "add the B register to the accumulator" in {
+    test(new CPU) { dut =>
+      loadReg(dut, Reg8.A, 1)
+      loadReg(dut, Reg8.B, 1)
+      dut.io.din.poke(Instructions.ADD_B.U)
+      dut.io.debug.registers8(Reg8.A).expect(1.U)
+      dut.clock.step(4)
+      dut.io.debug.registers8(Reg8.A).expect(2.U)
     }
   }
 

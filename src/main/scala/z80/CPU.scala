@@ -102,8 +102,8 @@ class CPU extends Module {
   // Instruction register
   val instructionReg = RegInit(0.U(CPU.DATA_WIDTH.W))
 
-  // Data input register
-  val dinReg = RegInit(0.U(CPU.DATA_WIDTH.W))
+  // Temporary register
+  val tempReg = RegInit(0.U(CPU.DATA_WIDTH.W))
 
   // Halt register
   val haltReg = RegInit(false.B)
@@ -123,7 +123,7 @@ class CPU extends Module {
   // Arithmetic logic unit
   val alu = Module(new ALU)
   alu.io.op := decoder.io.op
-  alu.io.a := registers8(decoder.io.busIndex)
+  alu.io.a := tempReg
   alu.io.b := registers8(Reg8.A.U)
   alu.io.flagsIn := registers8(Reg8.F)
 
@@ -140,7 +140,7 @@ class CPU extends Module {
   io.debug.registers8 := registers8
   io.debug.registers16 := registers16
 
-  printf(p"T: $tStateCounter ($tStates), M: $mCycleCounter ($mCycles), PC: $pcReg, IR: $instructionReg, dinReg: $dinReg\n")
+  printf(p"T: $tStateCounter ($tStates), M: $mCycleCounter ($mCycles), PC: $pcReg, IR: $instructionReg, tempReg: $tempReg, aluResult: ${alu.io.result}, srcIndex: ${decoder.io.srcIndex}, destIndex: ${decoder.io.destIndex}\n")
 
   switch(tStateCounter) {
     is(0.U) {
@@ -152,34 +152,40 @@ class CPU extends Module {
 
       // Assert M1 during first machine cycle
       io.m1 := mCycleCounter === 0.U
-    }
 
-    is(1.U) {
       // Fetch instruction
       io.mreq := true.B
       io.rd := true.B
-
-      // Assert M1 during first machine cycle
-      io.m1 := mCycleCounter === 0.U
     }
 
-    is(2.U) {
+    is(1.U) {
+      // Assert M1 during first machine cycle
+      io.m1 := mCycleCounter === 0.U
+
       // Latch an instruction only during first machine cycle. If the CPU is halted
       // then a NOP is forced.
       when(mCycleCounter === 0.U) {
         instructionReg := Mux(haltReg, Instructions.NOP.U, io.din)
       }
 
-      // Write the data input to the register bus.
-      when(decoder.io.wr) {
-        registers8(decoder.io.busIndex) := io.din
+      // Read the data input to the temp register
+      when(decoder.io.rd) {
+        tempReg := io.din
+      } otherwise {
+        tempReg := registers8(decoder.io.srcIndex)
+      }
+    }
+
+    is(2.U) {
+      when(decoder.io.rd) {
+        registers8(decoder.io.destIndex) := tempReg
       }
     }
 
     is(3.U) {
       // Write the result from the ALU to the register bus
-      when(decoder.io.wr) {
-        registers8(decoder.io.busIndex) := alu.io.result
+      when(decoder.io.store) {
+        registers8(decoder.io.destIndex) := alu.io.result
       }
 
       // Write the flags from the ALU to the F register

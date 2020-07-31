@@ -14,7 +14,7 @@
  * https://twitter.com/nullobject
  * https://github.com/nullobject
  *
- * Copyright (dut) 2020 Josh Bassett
+ * Copyright (c) 2020 Josh Bassett
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,8 +61,8 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "write to the bus" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.INC_A.U)
-      dut.io.busIndex.expect(Reg8.A.U)
-      dut.io.wr.expect(true.B)
+      dut.io.destIndex.expect(Reg8.A.U)
+      dut.io.store.expect(true.B)
     }
   }
 
@@ -76,8 +76,8 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
   it should "write to the bus" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.INC_B.U)
-      dut.io.busIndex.expect(Reg8.B.U)
-      dut.io.wr.expect(true.B)
+      dut.io.destIndex.expect(Reg8.B.U)
+      dut.io.store.expect(true.B)
     }
   }
 
@@ -92,8 +92,8 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.LD_A.U)
       dut.io.mCycle.poke(1.U)
-      dut.io.busIndex.expect(Reg8.A.U)
-      dut.io.wr.expect(true.B)
+      dut.io.destIndex.expect(Reg8.A.U)
+      dut.io.store.expect(true.B)
     }
   }
 
@@ -109,17 +109,47 @@ class DecoderTest extends FlatSpec with ChiselScalatestTester with Matchers {
       dut.io.instruction.poke(Instructions.LD_B.U)
       dut.io.mCycle.poke(1.U)
       dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(Reg8.B.U)
-      dut.io.wr.expect(true.B)
+      dut.io.destIndex.expect(Reg8.B.U)
+      dut.io.store.expect(true.B)
+    }
+  }
+
+  "ADD A" should "select ADD operation" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.ADD_A.U)
+      dut.io.op.expect(Ops.ADD.U)
+    }
+  }
+
+  it should "write to the bus" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.ADD_A.U)
+      dut.io.srcIndex.expect(Reg8.A.U)
+      dut.io.destIndex.expect(Reg8.A.U)
+      dut.io.store.expect(true.B)
+    }
+  }
+
+  "ADD B" should "select ADD operation" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.ADD_B.U)
+      dut.io.op.expect(Ops.ADD.U)
+    }
+  }
+
+  it should "write to the bus" in {
+    test(new Decoder) { dut =>
+      dut.io.instruction.poke(Instructions.ADD_B.U)
+      dut.io.srcIndex.expect(Reg8.B.U)
+      dut.io.destIndex.expect(Reg8.A.U)
+      dut.io.store.expect(true.B)
     }
   }
 
   it should "HALT" in {
     test(new Decoder) { dut =>
       dut.io.instruction.poke(Instructions.HALT.U)
-      dut.io.mCycle.poke(0.U)
       dut.io.op.expect(Ops.NOP.U)
-      dut.io.busIndex.expect(0.U)
       dut.io.halt.expect(true.B)
     }
   }

@@ -51,4 +51,6 @@ object Instructions {
   def INC_A  = 0x3c
   def LD_A   = 0x3e
   def HALT   = 0x76
+  def ADD_B  = 0x80
+  def ADD_A  = 0x87
 }
