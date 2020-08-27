@@ -152,13 +152,13 @@ class CPU extends Module {
 
       // Assert M1 during first machine cycle
       io.m1 := mCycleCounter === 0.U
-
-      // Fetch instruction
-      io.mreq := true.B
-      io.rd := true.B
     }
 
     is(1.U) {
+      // Fetch instruction
+      io.mreq := true.B
+      io.rd := true.B
+
       // Assert M1 during first machine cycle
       io.m1 := mCycleCounter === 0.U
 

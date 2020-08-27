@@ -73,11 +73,11 @@ class CPUTest extends FlatSpec with ChiselScalatestTester with Matchers with CPU
 
   it should "fetch an instruction during T2" in {
     test(new CPU) { dut =>
-      dut.io.mreq.expect(true.B)
-      dut.io.rd.expect(true.B)
-      dut.clock.step()
       dut.io.mreq.expect(false.B)
       dut.io.rd.expect(false.B)
+      dut.clock.step()
+      dut.io.mreq.expect(true.B)
+      dut.io.rd.expect(true.B)
       dut.clock.step()
       dut.io.mreq.expect(false.B)
       dut.io.rd.expect(false.B)
