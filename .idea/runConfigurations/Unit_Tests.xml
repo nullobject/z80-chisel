@@ -6,6 +6,15 @@
       <set />
     </option>
     <option name="testKind" value="All in package" />
+    <option name="classBuf">
+      <list>
+        <option value="z80.ALUTest" />
+        <option value="z80.CPUTest" />
+        <option value="z80.AdderTest" />
+        <option value="z80.CounterTest" />
+        <option value="z80.DecoderTest" />
+      </list>
+    </option>
     <option name="searchTest" value="In whole project" />
     <option name="testPackagePath" value="z80" />
     <option name="workingDirectory" value="$PROJECT_DIR$" />
